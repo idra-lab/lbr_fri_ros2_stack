@@ -35,9 +35,11 @@ class LBRROS2ControlMixin:
                 "lbr_joint_position_command_controller",
                 "lbr_torque_command_controller",
                 "lbr_wrench_command_controller",
+                "cartesian_impedance_controller",
+                "gravity_compensation",
             ],
         )
-
+    
     @staticmethod
     def arg_use_sim_time() -> DeclareLaunchArgument:
         return DeclareLaunchArgument(
@@ -74,6 +76,9 @@ class LBRROS2ControlMixin:
             namespace=robot_name,
             remappings=[
                 ("~/robot_description", "robot_description"),
+                ("cartesian_impedance_controller/target_frame", "target_frame"),
+                ("cartesian_impedance_controller/target_wrench", "target_wrench"),
+                ("motion_control_handle/target_frame", "target_frame"),
             ],
             **kwargs,
         )

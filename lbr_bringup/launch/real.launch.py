@@ -41,6 +41,9 @@ def launch_setup(context: LaunchContext) -> List[LaunchDescriptionEntity]:
     lbr_state_broadcaster = LBRROS2ControlMixin.node_controller_spawner(
         controller="lbr_state_broadcaster"
     )
+    lbr_motion_control_handle = LBRROS2ControlMixin.node_controller_spawner(
+        controller="motion_control_handle"
+    )
     controller = LBRROS2ControlMixin.node_controller_spawner(
         controller=LaunchConfiguration("ctrl")
     )
@@ -53,6 +56,7 @@ def launch_setup(context: LaunchContext) -> List[LaunchDescriptionEntity]:
                 force_torque_broadcaster,
                 lbr_state_broadcaster,
                 controller,
+                lbr_motion_control_handle,
             ],
         )
     )
