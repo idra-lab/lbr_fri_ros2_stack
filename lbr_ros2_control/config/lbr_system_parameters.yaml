@@ -2,8 +2,8 @@
 hardware:
   fri_client_sdk: # the fri_client_sdk version is used to create the correct state interfaces lbr_system_interface.xacro
     major_version: 1
-    minor_version: 15
-  client_command_mode: position # the command mode specifies the user-sent commands. Available: [position, torque, wrench]
+    minor_version: 17
+  client_command_mode: torque # the command mode specifies the user-sent commands. Available: [position, torque, wrench]
   port_id: 30200 # port id for the UDP communication. Useful in multi-robot setups
   remote_host: INADDR_ANY # the expected robot IP address. INADDR_ANY will accept any incoming connection
   rt_prio: 80 # real-time priority for the control loop
@@ -16,7 +16,7 @@ hardware:
   command_guard_variant: default # if requested position / velocities beyond limits, CommandGuard will be triggered and shut the connection. Available: [default, safe_stop]
   external_torque_cutoff_frequency: 10 # low-pass filter for the external joint torque measurements [Hz]
   measured_torque_cutoff_frequency: 10 # low-pass filter for the joint torque measurements [Hz]
-  open_loop: true # KUKA works the best in open_loop control mode
+  open_loop: false # KUKA works the best in open_loop control mode
 
 estimated_ft_sensor: # estimates the external force-torque from the external joint torque values
   chain_root: link_0

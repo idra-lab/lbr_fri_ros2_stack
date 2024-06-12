@@ -24,7 +24,9 @@ def generate_launch_description() -> LaunchDescription:
         use_sim_time=False,
     )
     ld.add_action(robot_state_publisher)
-    ros2_control_node = LBRSystemInterface.node_ros2_control()
+    ros2_control_node = LBRSystemInterface.node_ros2_control(
+        robot_description=robot_description,
+    )
     ld.add_action(ros2_control_node)
     joint_state_broadcaster = LBRSystemInterface.node_controller_spawner(
         controller="joint_state_broadcaster"

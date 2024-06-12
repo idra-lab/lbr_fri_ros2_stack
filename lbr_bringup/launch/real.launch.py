@@ -28,7 +28,9 @@ def launch_setup(context: LaunchContext) -> List[LaunchDescriptionEntity]:
     ld.add_action(robot_state_publisher)
 
     # ros2 control node
-    ros2_control_node = LBRROS2ControlMixin.node_ros2_control()
+    ros2_control_node = LBRROS2ControlMixin.node_ros2_control(
+        robot_description=robot_description,
+    )
     ld.add_action(ros2_control_node)
 
     # joint state broad caster and controller on ros2 control node start
@@ -41,9 +43,9 @@ def launch_setup(context: LaunchContext) -> List[LaunchDescriptionEntity]:
     lbr_state_broadcaster = LBRROS2ControlMixin.node_controller_spawner(
         controller="lbr_state_broadcaster"
     )
-    lbr_motion_control_handle = LBRROS2ControlMixin.node_controller_spawner(
-        controller="motion_control_handle"
-    )
+    # lbr_motion_control_handle = LBRROS2ControlMixin.node_controller_spawner(
+    #     controller="motion_control_handle"
+    # )
     controller = LBRROS2ControlMixin.node_controller_spawner(
         controller=LaunchConfiguration("ctrl")
     )
@@ -56,7 +58,7 @@ def launch_setup(context: LaunchContext) -> List[LaunchDescriptionEntity]:
                 force_torque_broadcaster,
                 lbr_state_broadcaster,
                 controller,
-                lbr_motion_control_handle,
+                # lbr_motion_control_handle,
             ],
         )
     )

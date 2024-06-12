@@ -50,6 +50,7 @@ class LBRROS2ControlMixin:
 
     @staticmethod
     def node_ros2_control(
+        robot_description: Dict[str, str],
         robot_name: Optional[Union[LaunchConfiguration, str]] = LaunchConfiguration(
             "robot_name", default="lbr"
         ),
@@ -59,6 +60,7 @@ class LBRROS2ControlMixin:
             package="controller_manager",
             executable="ros2_control_node",
             parameters=[
+                robot_description,
                 {"use_sim_time": False},
                 PathJoinSubstitution(
                     [
