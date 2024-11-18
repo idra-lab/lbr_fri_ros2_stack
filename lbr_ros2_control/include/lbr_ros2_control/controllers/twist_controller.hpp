@@ -29,6 +29,7 @@ namespace lbr_ros2_control {
 struct TwistParameters {
   std::string chain_root;
   std::string chain_tip;
+  bool twist_in_tip_frame;
   double damping;
   double max_linear_velocity;
   double max_angular_velocity;

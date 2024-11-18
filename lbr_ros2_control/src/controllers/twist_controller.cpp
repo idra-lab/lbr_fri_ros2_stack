@@ -25,6 +25,15 @@ void TwistImpl::compute(const geometry_msgs::msg::Twist::SharedPtr &twist_target
     return std::clamp(v, -parameters_.max_angular_velocity, parameters_.max_angular_velocity);
   });
 
+  // if desired, transform to tip frame
+  if (parameters_.twist_in_tip_frame) {
+    auto chain_tip_frame = kinematics_ptr_->compute_fk(q);
+    twist_target_.topRows(3) =
+        Eigen::Matrix3d::Map(chain_tip_frame.M.data).transpose() * twist_target_.topRows(3);
+    twist_target_.bottomRows(3) =
+        Eigen::Matrix3d::Map(chain_tip_frame.M.data).transpose() * twist_target_.bottomRows(3);
+  }
+
   // compute jacobian
   auto jacobian = kinematics_ptr_->compute_jacobian(q);
   jacobian_inv_ = lbr_fri_ros2::pinv(jacobian.data, parameters_.damping);
@@ -70,6 +79,7 @@ controller_interface::CallbackReturn TwistController::on_init() {
     this->get_node()->declare_parameter("robot_name", "lbr");
     this->get_node()->declare_parameter("chain_root", "lbr_link_0");
     this->get_node()->declare_parameter("chain_tip", "lbr_link_ee");
+    this->get_node()->declare_parameter("twist_in_tip_frame", true);
     this->get_node()->declare_parameter("damping", 0.2);
     this->get_node()->declare_parameter("max_linear_velocity", 0.1);
     this->get_node()->declare_parameter("max_angular_velocity", 0.1);
@@ -201,6 +211,7 @@ void TwistController::configure_twist_impl_() {
       this->get_robot_description(),
       TwistParameters{this->get_node()->get_parameter("chain_root").as_string(),
                       this->get_node()->get_parameter("chain_tip").as_string(),
+                      this->get_node()->get_parameter("twist_in_tip_frame").as_bool(),
                       this->get_node()->get_parameter("damping").as_double(),
                       this->get_node()->get_parameter("max_linear_velocity").as_double(),
                       this->get_node()->get_parameter("max_angular_velocity").as_double()});
