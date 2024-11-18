@@ -15,6 +15,7 @@ find_package(control_toolbox REQUIRED)
 find_package(eigen3_cmake_module REQUIRED)
 find_package(Eigen3)
 find_package(FRIClient REQUIRED)
+find_package(geometry_msgs REQUIRED)
 find_package(kdl_parser REQUIRED)
 find_package(lbr_fri_idl REQUIRED)
 find_package(orocos_kdl_vendor REQUIRED)
@@ -33,6 +34,7 @@ add_library(lbr_fri_ros2
     src/app.cpp
     src/async_client.cpp
     src/command_guard.cpp
+    src/control.cpp
     src/filters.cpp
     src/ft_estimator.cpp
     src/kinematics.cpp
@@ -48,6 +50,7 @@ target_include_directories(lbr_fri_ros2
 ament_target_dependencies(lbr_fri_ros2
   control_toolbox
   Eigen3
+  geometry_msgs
   kdl_parser
   lbr_fri_idl
   orocos_kdl_vendor
@@ -65,6 +68,7 @@ ament_export_dependencies(
   eigen3_cmake_module
   Eigen3
   FRIClient
+  geometry_msgs
   kdl_parser
   lbr_fri_idl
   orocos_kdl_vendor

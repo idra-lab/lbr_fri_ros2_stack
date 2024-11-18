@@ -31,6 +31,7 @@ find_package(realtime_tools REQUIRED)
 add_library(
   ${PROJECT_NAME}
   SHARED
+  src/controllers/admittance_controller.cpp
   src/controllers/lbr_joint_position_command_controller.cpp
   src/controllers/lbr_torque_command_controller.cpp
   src/controllers/lbr_wrench_command_controller.cpp

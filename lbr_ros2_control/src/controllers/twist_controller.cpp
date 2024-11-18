@@ -1,48 +1,6 @@
 #include "lbr_ros2_control/controllers/twist_controller.hpp"
 
 namespace lbr_ros2_control {
-TwistImpl::TwistImpl(const std::string &robot_description, const TwistParameters &parameters)
-    : parameters_(parameters) {
-  kinematics_ptr_ = std::make_unique<lbr_fri_ros2::Kinematics>(
-      robot_description, parameters_.chain_root, parameters_.chain_tip);
-}
-
-void TwistImpl::compute(const geometry_msgs::msg::Twist::SharedPtr &twist_target,
-                        lbr_fri_ros2::const_jnt_array_t_ref q, lbr_fri_ros2::jnt_array_t_ref dq) {
-  // twist to Eigen
-  twist_target_[0] = twist_target->linear.x;
-  twist_target_[1] = twist_target->linear.y;
-  twist_target_[2] = twist_target->linear.z;
-  twist_target_[3] = twist_target->angular.x;
-  twist_target_[4] = twist_target->angular.y;
-  twist_target_[5] = twist_target->angular.z;
-
-  // clip velocity
-  twist_target_.head(3).unaryExpr([&](double v) {
-    return std::clamp(v, -parameters_.max_linear_velocity, parameters_.max_linear_velocity);
-  });
-  twist_target_.tail(3).unaryExpr([&](double v) {
-    return std::clamp(v, -parameters_.max_angular_velocity, parameters_.max_angular_velocity);
-  });
-
-  // if desired, transform to tip frame
-  if (parameters_.twist_in_tip_frame) {
-    auto chain_tip_frame = kinematics_ptr_->compute_fk(q);
-    twist_target_.topRows(3) =
-        Eigen::Matrix3d::Map(chain_tip_frame.M.data).transpose() * twist_target_.topRows(3);
-    twist_target_.bottomRows(3) =
-        Eigen::Matrix3d::Map(chain_tip_frame.M.data).transpose() * twist_target_.bottomRows(3);
-  }
-
-  // compute jacobian
-  auto jacobian = kinematics_ptr_->compute_jacobian(q);
-  jacobian_inv_ = lbr_fri_ros2::pinv(jacobian.data, parameters_.damping);
-
-  // compute target joint veloctiy and map it to dq
-  Eigen::Map<Eigen::Matrix<double, lbr_fri_ros2::N_JNTS, 1>>(dq.data()) =
-      jacobian_inv_ * twist_target_;
-}
-
 TwistController::TwistController() : rt_twist_ptr_(nullptr), twist_subscription_ptr_(nullptr) {}
 
 controller_interface::InterfaceConfiguration
@@ -77,15 +35,15 @@ controller_interface::CallbackReturn TwistController::on_init() {
           updates_since_last_command_ = 0;
         });
     this->get_node()->declare_parameter("robot_name", "lbr");
-    this->get_node()->declare_parameter("chain_root", "lbr_link_0");
-    this->get_node()->declare_parameter("chain_tip", "lbr_link_ee");
-    this->get_node()->declare_parameter("twist_in_tip_frame", true);
-    this->get_node()->declare_parameter("damping", 0.2);
-    this->get_node()->declare_parameter("max_linear_velocity", 0.1);
-    this->get_node()->declare_parameter("max_angular_velocity", 0.1);
+    this->get_node()->declare_parameter("inv_jac_ctrl.chain_root", "lbr_link_0");
+    this->get_node()->declare_parameter("inv_jac_ctrl.chain_tip", "lbr_link_ee");
+    this->get_node()->declare_parameter("inv_jac_ctrl.twist_in_tip_frame", true);
+    this->get_node()->declare_parameter("inv_jac_ctrl.damping", 0.2);
+    this->get_node()->declare_parameter("inv_jac_ctrl.max_linear_velocity", 0.1);
+    this->get_node()->declare_parameter("inv_jac_ctrl.max_angular_velocity", 0.1);
     this->get_node()->declare_parameter("timeout", 0.2);
     configure_joint_names_();
-    configure_twist_impl_();
+    configure_inv_jac_ctrl_impl_();
     timeout_ = this->get_node()->get_parameter("timeout").as_double();
   } catch (const std::exception &e) {
     RCLCPP_ERROR(this->get_node()->get_logger(), "Failed to initialize twist controller with: %s.",
@@ -102,11 +60,11 @@ controller_interface::return_type TwistController::update(const rclcpp::Time & /
   if (!twist_command || !(*twist_command)) {
     return controller_interface::return_type::OK;
   }
-  if (!twist_impl_ptr_) {
-    RCLCPP_ERROR(this->get_node()->get_logger(), "Twist controller not initialized.");
+  if (!inv_jac_ctrl_impl_ptr_) {
+    RCLCPP_ERROR(this->get_node()->get_logger(), "Inverse Jacobian controller not initialized.");
     return controller_interface::return_type::ERROR;
   }
-  if (static_cast<int>(session_state_interface_->get().get_value()) !=
+  if (static_cast<int>(session_state_interface_ptr_->get().get_value()) !=
       KUKA::FRI::ESessionState::COMMANDING_ACTIVE) {
     return controller_interface::return_type::OK;
   }
@@ -123,12 +81,12 @@ controller_interface::return_type TwistController::update(const rclcpp::Time & /
   });
 
   // compute the joint velocity from the twist command target
-  twist_impl_ptr_->compute(*twist_command, q_, dq_);
+  inv_jac_ctrl_impl_ptr_->compute(*twist_command, q_, dq_);
 
   // pass joint positions to hardware
   std::for_each(q_.begin(), q_.end(), [&, i = 0](const double &q_i) mutable {
     this->command_interfaces_[i].set_value(
-        q_i + dq_[i] * sample_time_state_interface_->get().get_value());
+        q_i + dq_[i] * sample_time_state_interface_ptr_->get().get_value());
     ++i;
   });
 
@@ -164,12 +122,12 @@ bool TwistController::reference_state_interfaces_() {
       joint_position_state_interfaces_.emplace_back(std::ref(state_interface));
     }
     if (state_interface.get_interface_name() == HW_IF_SAMPLE_TIME) {
-      sample_time_state_interface_ =
+      sample_time_state_interface_ptr_ =
           std::make_unique<std::reference_wrapper<hardware_interface::LoanedStateInterface>>(
               std::ref(state_interface));
     }
     if (state_interface.get_interface_name() == HW_IF_SESSION_STATE) {
-      session_state_interface_ =
+      session_state_interface_ptr_ =
           std::make_unique<std::reference_wrapper<hardware_interface::LoanedStateInterface>>(
               std::ref(state_interface));
     }
@@ -206,15 +164,16 @@ void TwistController::configure_joint_names_() {
   }
 }
 
-void TwistController::configure_twist_impl_() {
-  twist_impl_ptr_ = std::make_unique<TwistImpl>(
+void TwistController::configure_inv_jac_ctrl_impl_() {
+  inv_jac_ctrl_impl_ptr_ = std::make_unique<lbr_fri_ros2::InvJacCtrlImpl>(
       this->get_robot_description(),
-      TwistParameters{this->get_node()->get_parameter("chain_root").as_string(),
-                      this->get_node()->get_parameter("chain_tip").as_string(),
-                      this->get_node()->get_parameter("twist_in_tip_frame").as_bool(),
-                      this->get_node()->get_parameter("damping").as_double(),
-                      this->get_node()->get_parameter("max_linear_velocity").as_double(),
-                      this->get_node()->get_parameter("max_angular_velocity").as_double()});
+      lbr_fri_ros2::InvJacCtrlParameters{
+          this->get_node()->get_parameter("inv_jac_ctrl.chain_root").as_string(),
+          this->get_node()->get_parameter("inv_jac_ctrl.chain_tip").as_string(),
+          this->get_node()->get_parameter("inv_jac_ctrl.twist_in_tip_frame").as_bool(),
+          this->get_node()->get_parameter("inv_jac_ctrl.damping").as_double(),
+          this->get_node()->get_parameter("inv_jac_ctrl.max_linear_velocity").as_double(),
+          this->get_node()->get_parameter("inv_jac_ctrl.max_angular_velocity").as_double()});
 }
 } // namespace lbr_ros2_control
 
