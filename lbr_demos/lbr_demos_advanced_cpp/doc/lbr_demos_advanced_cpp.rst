@@ -8,6 +8,10 @@ lbr_demos_advanced_cpp
    :local:
    :backlinks: none
 
+Twist Controller
+----------------
+TODO
+
 Admittance Controller
 ---------------------
 This demo implements a simple admittance controller.
@@ -15,7 +19,7 @@ This demo implements a simple admittance controller.
 #. Client side configurations:
 
     #. Configure the ``client_command_mode`` to ``position`` in `lbr_system_config.yaml <https://github.com/lbr-stack/lbr_fri_ros2_stack/blob/rolling/lbr_description/ros2_control/lbr_system_config.yaml>`_:octicon:`link-external`
-    #. Set the ``update_rate`` to ``100`` in `lbr_controllers.yaml <https://github.com/lbr-stack/lbr_fri_ros2_stack/blob/rolling/lbr_ros2_control/config/lbr_controllers.yaml>`_:octicon:`link-external`
+    #. Set the ``update_rate`` to ``100`` in `lbr_controllers.yaml <https://github.com/lbr-stack/lbr_fri_ros2_stack/blob/rolling/lbr_description/config/lbr_controllers.yaml>`_:octicon:`link-external`
 
 #. Remote side configurations:
 
@@ -56,7 +60,7 @@ kinematics to move the robot's end-effector along the z-axis in Cartesian space.
 #. Client side configurations:
 
     #. Configure the ``client_command_mode`` to ``position`` in `lbr_system_config.yaml <https://github.com/lbr-stack/lbr_fri_ros2_stack/blob/rolling/lbr_description/ros2_control/lbr_system_config.yaml>`_:octicon:`link-external`
-    #. Set the ``update_rate`` to ``100`` in `lbr_controllers.yaml <https://github.com/lbr-stack/lbr_fri_ros2_stack/blob/rolling/lbr_ros2_control/config/lbr_controllers.yaml>`_:octicon:`link-external`
+    #. Set the ``update_rate`` to ``100`` in `lbr_controllers.yaml <https://github.com/lbr-stack/lbr_fri_ros2_stack/blob/rolling/lbr_description/config/lbr_controllers.yaml>`_:octicon:`link-external`
 
 #. Remote side configurations:
 

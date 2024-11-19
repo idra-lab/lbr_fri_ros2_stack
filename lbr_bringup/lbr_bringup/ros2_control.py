@@ -11,7 +11,7 @@ class LBRROS2ControlMixin:
     def arg_ctrl_cfg_pkg() -> DeclareLaunchArgument:
         return DeclareLaunchArgument(
             name="ctrl_cfg_pkg",
-            default_value="lbr_ros2_control",
+            default_value="lbr_description",
             description="Controller configuration package. The package containing the ctrl_cfg.",
         )
 
