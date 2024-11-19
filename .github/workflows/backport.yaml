@@ -31,3 +31,4 @@ jobs:
         with:
           label_pattern: ""
           target_branches: humble
+          merge_commits: skip
