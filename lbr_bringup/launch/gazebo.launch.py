@@ -13,7 +13,7 @@ def generate_launch_description() -> LaunchDescription:
     ld.add_action(LBRDescriptionMixin.arg_robot_name())
     ld.add_action(
         LBRROS2ControlMixin.arg_ctrl()
-    )  # Gazebo loads controller configuration through lbr_description/gazebo/*.xacro from lbr_description/config/lbr_controllers.yaml
+    )  # Gazebo loads controller configuration through lbr_description/gazebo/*.xacro from lbr_description/ros2_control/lbr_controllers.yaml
 
     # static transform world -> <robot_name>_floating_link
     world_robot_tf = [0, 0, 0, 0, 0, 0]  # keep zero
