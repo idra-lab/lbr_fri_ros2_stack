@@ -11,7 +11,7 @@ class LBRROS2ControlMixin:
     def arg_ctrl_cfg_pkg() -> DeclareLaunchArgument:
         return DeclareLaunchArgument(
             name="ctrl_cfg_pkg",
-            default_value="lbr_ros2_control",
+            default_value="lbr_description",
             description="Controller configuration package. The package containing the ctrl_cfg.",
         )
 
@@ -19,7 +19,7 @@ class LBRROS2ControlMixin:
     def arg_ctrl_cfg() -> DeclareLaunchArgument:
         return DeclareLaunchArgument(
             name="ctrl_cfg",
-            default_value="config/lbr_controllers.yaml",
+            default_value="ros2_control/lbr_controllers.yaml",
             description="Relative path from ctrl_cfg_pkg to the controllers.",
         )
 
@@ -30,6 +30,7 @@ class LBRROS2ControlMixin:
             default_value="joint_trajectory_controller",
             description="Desired default controller. One of specified in ctrl_cfg.",
             choices=[
+                "admittance_controller",
                 "joint_trajectory_controller",
                 "forward_position_controller",
                 "lbr_joint_position_command_controller",
@@ -82,11 +83,11 @@ class LBRROS2ControlMixin:
                     [
                         FindPackageShare(
                             LaunchConfiguration(
-                                "ctrl_cfg_pkg", default="lbr_ros2_control"
+                                "ctrl_cfg_pkg", default="lbr_description"
                             )
                         ),
                         LaunchConfiguration(
-                            "ctrl_cfg", default="config/lbr_controllers.yaml"
+                            "ctrl_cfg", default="ros2_control/lbr_controllers.yaml"
                         ),
                     ]
                 ),

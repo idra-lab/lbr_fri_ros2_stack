@@ -23,7 +23,6 @@
 #include "lbr_fri_ros2/app.hpp"
 #include "lbr_fri_ros2/async_client.hpp"
 #include "lbr_fri_ros2/command_guard.hpp"
-#include "lbr_fri_ros2/filters.hpp"
 #include "lbr_fri_ros2/formatting.hpp"
 #include "lbr_fri_ros2/ft_estimator.hpp"
 #include "lbr_fri_ros2/interfaces/state.hpp"
@@ -44,15 +43,10 @@ struct SystemInterfaceParameters {
   const char *remote_host{nullptr};
   int32_t rt_prio{80};
   bool open_loop{true};
-  double pid_p{0.0};
-  double pid_i{0.0};
-  double pid_d{0.0};
-  double pid_i_max{0.0};
-  double pid_i_min{0.0};
-  double pid_antiwindup{0.0};
+  double joint_position_tau{0.04};
   std::string command_guard_variant{"default"};
-  double external_torque_cutoff_frequency{10.0};
-  double measured_torque_cutoff_frequency{10.0};
+  double external_torque_tau{0.04};
+  double measured_torque_tau{0.04};
 };
 
 struct EstimatedFTSensorParameters {

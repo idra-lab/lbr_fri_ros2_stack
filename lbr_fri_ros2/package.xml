@@ -13,8 +13,8 @@
 
   <build_depend>eigen</build_depend>
 
-  <depend>control_toolbox</depend>
   <depend>fri_client_sdk</depend>
+  <depend>geometry_msgs</depend>
   <depend>kdl_parser</depend>
   <depend>lbr_fri_idl</depend>
   <depend>orocos_kdl_vendor</depend>

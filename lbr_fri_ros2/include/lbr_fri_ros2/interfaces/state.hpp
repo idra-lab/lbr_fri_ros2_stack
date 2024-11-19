@@ -1,6 +1,8 @@
 #ifndef LBR_FRI_ROS2__INTERFACES__STATE_HPP_
 #define LBR_FRI_ROS2__INTERFACES__STATE_HPP_
+
 #include <atomic>
+#include <cstring>
 #include <string>
 
 #include "rclcpp/logger.hpp"
@@ -14,8 +16,8 @@
 
 namespace lbr_fri_ros2 {
 struct StateInterfaceParameters {
-  double external_torque_cutoff_frequency; /*Hz*/
-  double measured_torque_cutoff_frequency; /*Hz*/
+  double external_torque_tau; /*seconds*/
+  double measured_torque_tau; /*seconds*/
 };
 
 class StateInterface {
@@ -24,7 +26,7 @@ protected:
 
 public:
   StateInterface() = delete;
-  StateInterface(const StateInterfaceParameters &state_interface_parameters = {10.0, 10.0});
+  StateInterface(const StateInterfaceParameters &state_interface_parameters = {0.04, 0.04});
 
   inline const_idl_state_t_ref get_state() const { return state_; };
 
