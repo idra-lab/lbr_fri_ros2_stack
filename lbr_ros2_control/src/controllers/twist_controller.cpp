@@ -44,6 +44,7 @@ controller_interface::CallbackReturn TwistController::on_init() {
     this->get_node()->declare_parameter("timeout", 0.2);
     configure_joint_names_();
     configure_inv_jac_ctrl_impl_();
+    log_info_();
     timeout_ = this->get_node()->get_parameter("timeout").as_double();
   } catch (const std::exception &e) {
     RCLCPP_ERROR(this->get_node()->get_logger(), "Failed to initialize twist controller with: %s.",
@@ -175,6 +176,8 @@ void TwistController::configure_inv_jac_ctrl_impl_() {
           this->get_node()->get_parameter("inv_jac_ctrl.max_linear_velocity").as_double(),
           this->get_node()->get_parameter("inv_jac_ctrl.max_angular_velocity").as_double()});
 }
+
+void TwistController::log_info_() const { inv_jac_ctrl_impl_ptr_->log_info(); }
 } // namespace lbr_ros2_control
 
 #include "pluginlib/class_list_macros.hpp"

@@ -50,6 +50,7 @@ controller_interface::CallbackReturn AdmittanceController::on_init() {
     configure_joint_names_();
     configure_admittance_impl_();
     configure_inv_jac_ctrl_impl_();
+    log_info_();
   } catch (const std::exception &e) {
     RCLCPP_ERROR(this->get_node()->get_logger(),
                  "Failed to initialize admittance controller with: %s.", e.what());
@@ -76,7 +77,7 @@ controller_interface::return_type AdmittanceController::update(const rclcpp::Tim
   // compute forward kinematics
   auto chain_tip_frame = inv_jac_ctrl_impl_ptr_->get_kinematics_ptr()->compute_fk(q_);
   x_.head(3) = Eigen::Map<Eigen::Matrix<double, 3, 1>>(chain_tip_frame.p.data);
-  chain_tip_frame.M.GetRPY(x_init_[3], x_init_[4], x_init_[5]);
+  x_.tail(3) = Eigen::Map<Eigen::Matrix<double, 3, 1>>(chain_tip_frame.M.GetRot().data);
 
   // compute steady state position and orientation
   if (!initialized_) {
@@ -85,14 +86,16 @@ controller_interface::return_type AdmittanceController::update(const rclcpp::Tim
     initialized_ = true;
   }
 
-  // compute velocity
+  // compute velocity & update previous position
   dx_ = (x_ - x_prev_) / period.seconds();
+  x_prev_ = x_;
+
+  // convert f_ext_ back to root frame
+  f_ext_.head(3) = Eigen::Matrix3d::Map(chain_tip_frame.M.data).transpose() * f_ext_.head(3);
+  f_ext_.tail(3) = Eigen::Matrix3d::Map(chain_tip_frame.M.data).transpose() * f_ext_.tail(3);
 
   // compute admittance
   admittance_impl_ptr_->compute(f_ext_, x_ - x_init_, dx_, ddx_);
-
-  // update previous position
-  x_prev_ = x_;
 
   // integrate ddx_ to command velocity
   twist_command_ = ddx_ * period.seconds();
@@ -198,17 +201,11 @@ void AdmittanceController::configure_joint_names_() {
 }
 
 void AdmittanceController::configure_admittance_impl_() {
-  admittance_impl_ptr_ = std::make_unique<AdmittanceImpl>(
-      AdmittanceParameters{this->get_node()->get_parameter("admittance.mass").as_double(),
-                           this->get_node()->get_parameter("admittance.damping").as_double(),
-                           this->get_node()->get_parameter("admittance.stiffness").as_double()});
-  RCLCPP_INFO(this->get_node()->get_logger(), "Admittance controller initialized.");
-  RCLCPP_INFO(this->get_node()->get_logger(), "Mass: %f",
-              this->get_node()->get_parameter("admittance.mass").as_double());
-  RCLCPP_INFO(this->get_node()->get_logger(), "Damping: %f",
-              this->get_node()->get_parameter("admittance.damping").as_double());
-  RCLCPP_INFO(this->get_node()->get_logger(), "Stiffness: %f",
-              this->get_node()->get_parameter("admittance.stiffness").as_double());
+  admittance_impl_ptr_ =
+      std::make_unique<lbr_fri_ros2::AdmittanceImpl>(lbr_fri_ros2::AdmittanceParameters{
+          this->get_node()->get_parameter("admittance.mass").as_double(),
+          this->get_node()->get_parameter("admittance.damping").as_double(),
+          this->get_node()->get_parameter("admittance.stiffness").as_double()});
 }
 
 void AdmittanceController::configure_inv_jac_ctrl_impl_() {
@@ -217,7 +214,7 @@ void AdmittanceController::configure_inv_jac_ctrl_impl_() {
       lbr_fri_ros2::InvJacCtrlParameters{
           this->get_node()->get_parameter("inv_jac_ctrl.chain_root").as_string(),
           this->get_node()->get_parameter("inv_jac_ctrl.chain_tip").as_string(),
-          true, // always assume twist in tip frame, since force-torque is estimated in tip frame
+          false, // always assume twist in root frame
           this->get_node()->get_parameter("inv_jac_ctrl.damping").as_double(),
           this->get_node()->get_parameter("inv_jac_ctrl.max_linear_velocity").as_double(),
           this->get_node()->get_parameter("inv_jac_ctrl.max_angular_velocity").as_double()});
@@ -230,6 +227,11 @@ void AdmittanceController::zero_all_values_() {
   ddx_.setZero();
   std::fill(dq_.begin(), dq_.end(), 0.0);
   twist_command_.setZero();
+}
+
+void AdmittanceController::log_info_() const {
+  admittance_impl_ptr_->log_info();
+  inv_jac_ctrl_impl_ptr_->log_info();
 }
 } // namespace lbr_ros2_control
 

@@ -52,6 +52,7 @@ protected:
   void reset_command_buffer_();
   void configure_joint_names_();
   void configure_inv_jac_ctrl_impl_();
+  void log_info_() const;
 
   // some safety checks
   std::atomic<int> updates_since_last_command_ = 0;

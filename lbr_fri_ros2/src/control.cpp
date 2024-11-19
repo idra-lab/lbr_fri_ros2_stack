@@ -44,6 +44,20 @@ void InvJacCtrlImpl::compute(const Eigen::Matrix<double, CARTESIAN_DOF, 1> &twis
   compute_impl_(q, dq);
 }
 
+void InvJacCtrlImpl::log_info() const {
+  RCLCPP_INFO(rclcpp::get_logger(LOGGER_NAME), "*** Parameters:");
+  RCLCPP_INFO(rclcpp::get_logger(LOGGER_NAME), "*   Chain root: %s",
+              parameters_.chain_root.c_str());
+  RCLCPP_INFO(rclcpp::get_logger(LOGGER_NAME), "*   Chain tip: %s", parameters_.chain_tip.c_str());
+  RCLCPP_INFO(rclcpp::get_logger(LOGGER_NAME), "*   Twist in tip frame: %s",
+              parameters_.twist_in_tip_frame ? "true" : "false");
+  RCLCPP_INFO(rclcpp::get_logger(LOGGER_NAME), "*   Damping: %.3f", parameters_.damping);
+  RCLCPP_INFO(rclcpp::get_logger(LOGGER_NAME), "*   Max linear velocity: %.3f",
+              parameters_.max_linear_velocity);
+  RCLCPP_INFO(rclcpp::get_logger(LOGGER_NAME), "*   Max angular velocity: %.3f",
+              parameters_.max_angular_velocity);
+}
+
 void InvJacCtrlImpl::compute_impl_(const_jnt_array_t_ref q, jnt_array_t_ref dq) {
   // clip velocity
   twist_target_.head(3).unaryExpr([&](double v) {
@@ -68,5 +82,24 @@ void InvJacCtrlImpl::compute_impl_(const_jnt_array_t_ref q, jnt_array_t_ref dq) 
 
   // compute target joint veloctiy and map it to dq
   Eigen::Map<Eigen::Matrix<double, N_JNTS, 1>>(dq.data()) = jacobian_inv_ * twist_target_;
+}
+
+void AdmittanceImpl::compute(const Eigen::Matrix<double, lbr_fri_ros2::CARTESIAN_DOF, 1> &f_ext,
+                             const Eigen::Matrix<double, lbr_fri_ros2::CARTESIAN_DOF, 1> &x,
+                             const Eigen::Matrix<double, lbr_fri_ros2::CARTESIAN_DOF, 1> &dx,
+                             Eigen::Matrix<double, lbr_fri_ros2::CARTESIAN_DOF, 1> &ddx) {
+  if (parameters_.m <= 0.0) {
+    throw std::runtime_error("Mass must be positive and greater zero.");
+  }
+  ddx = (f_ext - parameters_.b * dx - parameters_.k * x) / parameters_.m;
+}
+
+void AdmittanceImpl::log_info() const {
+  {
+    RCLCPP_INFO(rclcpp::get_logger(LOGGER_NAME), "*** Parameters:");
+    RCLCPP_INFO(rclcpp::get_logger(LOGGER_NAME), "*   Mass: %.3f", parameters_.m);
+    RCLCPP_INFO(rclcpp::get_logger(LOGGER_NAME), "*   Damping: %.3f", parameters_.b);
+    RCLCPP_INFO(rclcpp::get_logger(LOGGER_NAME), "*   Stiffness: %.3f", parameters_.k);
+  }
 }
 } // namespace lbr_fri_ros2

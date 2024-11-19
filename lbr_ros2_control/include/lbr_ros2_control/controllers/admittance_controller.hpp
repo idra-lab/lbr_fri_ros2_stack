@@ -21,27 +21,6 @@
 #include "lbr_ros2_control/system_interface_type_values.hpp"
 
 namespace lbr_ros2_control {
-struct AdmittanceParameters {
-  double m = 1.0;
-  double b = 0.1;
-  double k = 0.0;
-};
-
-class AdmittanceImpl {
-public:
-  AdmittanceImpl(const AdmittanceParameters &parameters) : parameters_(parameters) {}
-
-  void compute(const Eigen::Matrix<double, lbr_fri_ros2::CARTESIAN_DOF, 1> &f_ext,
-               const Eigen::Matrix<double, lbr_fri_ros2::CARTESIAN_DOF, 1> &x,
-               const Eigen::Matrix<double, lbr_fri_ros2::CARTESIAN_DOF, 1> &dx,
-               Eigen::Matrix<double, lbr_fri_ros2::CARTESIAN_DOF, 1> &ddx) {
-    ddx = (f_ext - parameters_.b * dx - parameters_.k * x) / parameters_.m;
-  }
-
-protected:
-  AdmittanceParameters parameters_;
-};
-
 class AdmittanceController : public controller_interface::ControllerInterface {
 public:
   AdmittanceController();
@@ -71,10 +50,11 @@ protected:
   void configure_admittance_impl_();
   void configure_inv_jac_ctrl_impl_();
   void zero_all_values_();
+  void log_info_() const;
 
   // admittance
   bool initialized_ = false;
-  std::unique_ptr<AdmittanceImpl> admittance_impl_ptr_;
+  std::unique_ptr<lbr_fri_ros2::AdmittanceImpl> admittance_impl_ptr_;
   Eigen::Matrix<double, lbr_fri_ros2::CARTESIAN_DOF, 1> x_init_, x_prev_;
   Eigen::Matrix<double, lbr_fri_ros2::CARTESIAN_DOF, 1> f_ext_, x_, dx_, ddx_;
 
