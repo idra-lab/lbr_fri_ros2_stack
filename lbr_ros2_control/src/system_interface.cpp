@@ -18,15 +18,8 @@ SystemInterface::on_init(const hardware_interface::HardwareInfo &system_info) {
   }
 
   // setup driver
-  lbr_fri_ros2::PIDParameters pid_parameters;
   lbr_fri_ros2::CommandGuardParameters command_guard_parameters;
   lbr_fri_ros2::StateInterfaceParameters state_interface_parameters;
-  pid_parameters.p = parameters_.pid_p;
-  pid_parameters.i = parameters_.pid_i;
-  pid_parameters.d = parameters_.pid_d;
-  pid_parameters.i_max = parameters_.pid_i_max;
-  pid_parameters.i_min = parameters_.pid_i_min;
-  pid_parameters.antiwindup = parameters_.pid_antiwindup;
   for (std::size_t idx = 0; idx < system_info.joints.size(); ++idx) {
     command_guard_parameters.joint_names[idx] = system_info.joints[idx].name;
     command_guard_parameters.max_positions[idx] =
@@ -38,14 +31,12 @@ SystemInterface::on_init(const hardware_interface::HardwareInfo &system_info) {
     command_guard_parameters.max_torques[idx] =
         std::stod(system_info.joints[idx].parameters.at("max_torque"));
   }
-  state_interface_parameters.external_torque_cutoff_frequency =
-      parameters_.external_torque_cutoff_frequency;
-  state_interface_parameters.measured_torque_cutoff_frequency =
-      parameters_.measured_torque_cutoff_frequency;
+  state_interface_parameters.external_torque_tau = parameters_.external_torque_tau;
+  state_interface_parameters.measured_torque_tau = parameters_.measured_torque_tau;
 
   try {
     async_client_ptr_ = std::make_shared<lbr_fri_ros2::AsyncClient>(
-        parameters_.client_command_mode, pid_parameters, command_guard_parameters,
+        parameters_.client_command_mode, parameters_.joint_position_tau, command_guard_parameters,
         parameters_.command_guard_variant, state_interface_parameters, parameters_.open_loop);
     app_ptr_ = std::make_unique<lbr_fri_ros2::App>(async_client_ptr_);
   } catch (const std::exception &e) {
@@ -412,17 +403,10 @@ bool SystemInterface::parse_parameters_(const hardware_interface::HardwareInfo &
                    info_.hardware_parameters["pid_antiwindup"].end(),
                    info_.hardware_parameters["pid_antiwindup"].begin(),
                    ::tolower); // convert to lower case
-    parameters_.pid_p = std::stod(info_.hardware_parameters["pid_p"]);
-    parameters_.pid_i = std::stod(info_.hardware_parameters["pid_i"]);
-    parameters_.pid_d = std::stod(info_.hardware_parameters["pid_d"]);
-    parameters_.pid_i_max = std::stod(info_.hardware_parameters["pid_i_max"]);
-    parameters_.pid_i_min = std::stod(info_.hardware_parameters["pid_i_min"]);
-    parameters_.pid_antiwindup = info_.hardware_parameters["pid_antiwindup"] == "true";
+    parameters_.joint_position_tau = std::stod(info_.hardware_parameters["joint_position_tau"]);
     parameters_.command_guard_variant = system_info.hardware_parameters.at("command_guard_variant");
-    parameters_.external_torque_cutoff_frequency =
-        std::stod(info_.hardware_parameters["external_torque_cutoff_frequency"]);
-    parameters_.measured_torque_cutoff_frequency =
-        std::stod(info_.hardware_parameters["measured_torque_cutoff_frequency"]);
+    parameters_.external_torque_tau = std::stod(info_.hardware_parameters["external_torque_tau"]);
+    parameters_.measured_torque_tau = std::stod(info_.hardware_parameters["measured_torque_tau"]);
   } catch (const std::out_of_range &e) {
     RCLCPP_ERROR_STREAM(rclcpp::get_logger(LOGGER_NAME),
                         lbr_fri_ros2::ColorScheme::ERROR

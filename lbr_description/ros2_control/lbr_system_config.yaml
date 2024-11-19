@@ -7,15 +7,19 @@ hardware:
   port_id: 30200 # port id for the UDP communication. Useful in multi-robot setups
   remote_host: INADDR_ANY # the expected robot IP address. INADDR_ANY will accept any incoming connection
   rt_prio: 80 # real-time priority for the control loop
-  pid_p: 0.1 # P gain for the joint position  (useful for asynchronous control)
-  pid_i: 0.0 # I gain for the joint position command
-  pid_d: 0.0 # D gain for the joint position command
-  pid_i_max: 0.0 # max integral value for the joint position command
-  pid_i_min: 0.0 # min integral value for the joint position command
-  pid_antiwindup: false # enable antiwindup for the joint position command
+  # exponential moving average time constant for joint position commands [s]:
+  #   Set tau > robot sample time for more smoothing on the commands
+  #   Set tau << robot sample time for no smoothing on the commands
+  joint_position_tau: 0.04
   command_guard_variant: default # if requested position / velocities beyond limits, CommandGuard will be triggered and shut the connection. Available: [default, safe_stop]
-  external_torque_cutoff_frequency: 10 # low-pass filter for the external joint torque measurements [Hz]
-  measured_torque_cutoff_frequency: 10 # low-pass filter for the joint torque measurements [Hz]
+  # exponential moving average time constant for external joint torque measurements [s]:
+  #   Set tau > robot sample time for more smoothing on the external torque measurements
+  #   Set tau << robot sample time for more smoothing on the external torque measurements
+  external_torque_tau: 0.04
+  # exponential moving average time constant for joint torque measurements [s]:
+  #   Set tau > robot sample time for more smoothing on the raw torque measurements
+  #   Set tau << robot sample time for more smoothing on the raw torque measurements
+  measured_torque_tau: 0.04
   open_loop: true # KUKA works the best in open_loop control mode
 
 estimated_ft_sensor: # estimates the external force-torque from the external joint torque values

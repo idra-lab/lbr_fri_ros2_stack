@@ -24,7 +24,7 @@ protected:
 
 public:
   BaseCommandInterface() = delete;
-  BaseCommandInterface(const PIDParameters &pid_parameters,
+  BaseCommandInterface(const double &joint_position_tau,
                        const CommandGuardParameters &command_guard_parameters,
                        const std::string &command_guard_variant = "default");
 
@@ -39,7 +39,7 @@ public:
 
 protected:
   std::unique_ptr<CommandGuard> command_guard_;
-  JointPIDArray joint_position_pid_;
+  JointExponentialFilterArray joint_position_filter_;
   idl_command_t command_, command_target_;
 };
 } // namespace lbr_fri_ros2

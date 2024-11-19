@@ -27,15 +27,10 @@
                     <param name="port_id">${system_config['hardware']['port_id']}</param>
                     <param name="remote_host">${system_config['hardware']['remote_host']}</param>
                     <param name="rt_prio">${system_config['hardware']['rt_prio']}</param>
-                    <param name="pid_p">${system_config['hardware']['pid_p']}</param>
-                    <param name="pid_i">${system_config['hardware']['pid_i']}</param>
-                    <param name="pid_d">${system_config['hardware']['pid_d']}</param>
-                    <param name="pid_i_max">${system_config['hardware']['pid_i_max']}</param>
-                    <param name="pid_i_min">${system_config['hardware']['pid_i_min']}</param>
-                    <param name="pid_antiwindup">${system_config['hardware']['pid_antiwindup']}</param>
+                    <param name="joint_position_tau">${system_config['hardware']['joint_position_tau']}</param>
                     <param name="command_guard_variant">${system_config['hardware']['command_guard_variant']}</param>
-                    <param name="external_torque_cutoff_frequency">${system_config['hardware']['external_torque_cutoff_frequency']}</param>
-                    <param name="measured_torque_cutoff_frequency">${system_config['hardware']['measured_torque_cutoff_frequency']}</param>
+                    <param name="external_torque_tau">${system_config['hardware']['external_torque_tau']}</param>
+                    <param name="measured_torque_tau">${system_config['hardware']['measured_torque_tau']}</param>
                     <param name="open_loop">${system_config['hardware']['open_loop']}</param>
                 </hardware>
             </xacro:if>

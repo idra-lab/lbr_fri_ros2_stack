@@ -15,7 +15,6 @@ void StateInterface::set_state(const_fri_state_t_ref state) {
   state_.connection_quality = state.getConnectionQuality();
   state_.control_mode = state.getControlMode();
   state_.drive_state = state.getDriveState();
-  external_torque_filter_.compute(state.getExternalTorque(), state_.external_torque);
   if (state.getSessionState() == KUKA::FRI::ESessionState::COMMANDING_WAIT ||
       state.getSessionState() == KUKA::FRI::ESessionState::COMMANDING_ACTIVE) {
     std::memcpy(state_.ipo_joint_position.data(), state.getIpoJointPosition(),
@@ -23,7 +22,6 @@ void StateInterface::set_state(const_fri_state_t_ref state) {
   }
   std::memcpy(state_.measured_joint_position.data(), state.getMeasuredJointPosition(),
               sizeof(double) * fri_state_t::NUMBER_OF_JOINTS);
-  measured_torque_filter_.compute(state.getMeasuredTorque(), state_.measured_torque);
   state_.operation_mode = state.getOperationMode();
   state_.overlay_type = state.getOverlayType();
   state_.safety_state = state.getSafetyState();
@@ -34,9 +32,14 @@ void StateInterface::set_state(const_fri_state_t_ref state) {
   state_.tracking_performance = state.getTrackingPerformance();
 
   if (!external_torque_filter_.is_initialized() || !measured_torque_filter_.is_initialized()) {
-    // initialize once state_ is available
+    // initialize state_.sample_time is available
     init_filters_();
   }
+
+  // only compute after state_.sample_time is available
+  external_torque_filter_.compute(state.getExternalTorque(), state_.external_torque);
+  measured_torque_filter_.compute(state.getMeasuredTorque(), state_.measured_torque);
+
   state_initialized_ = true;
 };
 
@@ -52,7 +55,6 @@ void StateInterface::set_state_open_loop(const_fri_state_t_ref state,
   state_.connection_quality = state.getConnectionQuality();
   state_.control_mode = state.getControlMode();
   state_.drive_state = state.getDriveState();
-  external_torque_filter_.compute(state.getExternalTorque(), state_.external_torque);
   if (state.getSessionState() == KUKA::FRI::ESessionState::COMMANDING_WAIT ||
       state.getSessionState() == KUKA::FRI::ESessionState::COMMANDING_ACTIVE) {
     std::memcpy(state_.ipo_joint_position.data(), state.getIpoJointPosition(),
@@ -60,7 +62,6 @@ void StateInterface::set_state_open_loop(const_fri_state_t_ref state,
   }
   std::memcpy(state_.measured_joint_position.data(), joint_position.data(),
               sizeof(double) * fri_state_t::NUMBER_OF_JOINTS);
-  measured_torque_filter_.compute(state.getMeasuredTorque(), state_.measured_torque);
   state_.operation_mode = state.getOperationMode();
   state_.overlay_type = state.getOverlayType();
   state_.safety_state = state.getSafetyState();
@@ -71,24 +72,27 @@ void StateInterface::set_state_open_loop(const_fri_state_t_ref state,
   state_.tracking_performance = state.getTrackingPerformance();
 
   if (!external_torque_filter_.is_initialized() || !measured_torque_filter_.is_initialized()) {
-    // initialize once state_ is available
+    // initialize state_.sample_time is available
     init_filters_();
   }
+
+  // only compute after state_.sample_time is available
+  external_torque_filter_.compute(state.getExternalTorque(), state_.external_torque);
+  measured_torque_filter_.compute(state.getMeasuredTorque(), state_.measured_torque);
+
   state_initialized_ = true;
 }
 
 void StateInterface::init_filters_() {
-  external_torque_filter_.initialize(parameters_.external_torque_cutoff_frequency,
-                                     state_.sample_time);
-  measured_torque_filter_.initialize(parameters_.measured_torque_cutoff_frequency,
-                                     state_.sample_time);
+  external_torque_filter_.initialize(parameters_.external_torque_tau, state_.sample_time);
+  measured_torque_filter_.initialize(parameters_.measured_torque_tau, state_.sample_time);
 }
 
 void StateInterface::log_info() const {
   RCLCPP_INFO(rclcpp::get_logger(LOGGER_NAME), "*** Parameters:");
-  RCLCPP_INFO(rclcpp::get_logger(LOGGER_NAME), "*   external_torque_cutoff_frequency: %.1f Hz",
-              parameters_.external_torque_cutoff_frequency);
-  RCLCPP_INFO(rclcpp::get_logger(LOGGER_NAME), "*   measured_torque_cutoff_frequency: %.1f Hz",
-              parameters_.measured_torque_cutoff_frequency);
+  RCLCPP_INFO(rclcpp::get_logger(LOGGER_NAME), "*   external_torque_tau: %.5f s",
+              parameters_.external_torque_tau);
+  RCLCPP_INFO(rclcpp::get_logger(LOGGER_NAME), "*   measured_torque_tau: %.5f s",
+              parameters_.measured_torque_tau);
 }
 } // namespace lbr_fri_ros2

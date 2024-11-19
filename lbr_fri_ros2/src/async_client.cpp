@@ -2,7 +2,7 @@
 
 namespace lbr_fri_ros2 {
 AsyncClient::AsyncClient(const KUKA::FRI::EClientCommandMode &client_command_mode,
-                         const PIDParameters &pid_parameters,
+                         const double &joint_position_tau,
                          const CommandGuardParameters &command_guard_parameters,
                          const std::string &command_guard_variant,
                          const StateInterfaceParameters &state_interface_parameters,
@@ -26,16 +26,16 @@ AsyncClient::AsyncClient(const KUKA::FRI::EClientCommandMode &client_command_mod
 #endif
   {
     command_interface_ptr_ = std::make_shared<PositionCommandInterface>(
-        pid_parameters, command_guard_parameters, command_guard_variant);
+        joint_position_tau, command_guard_parameters, command_guard_variant);
     break;
   }
   case KUKA::FRI::EClientCommandMode::TORQUE:
     command_interface_ptr_ = std::make_shared<TorqueCommandInterface>(
-        pid_parameters, command_guard_parameters, command_guard_variant);
+        joint_position_tau, command_guard_parameters, command_guard_variant);
     break;
   case KUKA::FRI::EClientCommandMode::WRENCH:
     command_interface_ptr_ = std::make_shared<WrenchCommandInterface>(
-        pid_parameters, command_guard_parameters, command_guard_variant);
+        joint_position_tau, command_guard_parameters, command_guard_variant);
     break;
   default:
     std::string err = "Unsupported client command mode.";
