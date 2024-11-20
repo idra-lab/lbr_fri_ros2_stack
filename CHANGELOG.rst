@@ -5,21 +5,21 @@ Humble v2.2.0 (2024-11-20)
 --------------------------
 This release backports new ``rolling`` features to ``humble``. Following has changed:
 
-  * Related PRs:
+* Related PRs:
 
-    * https://github.com/lbr-stack/lbr_fri_ros2_stack/pull/213 and https://github.com/lbr-stack/lbr_fri_ros2_stack/pull/214
+  * https://github.com/lbr-stack/lbr_fri_ros2_stack/pull/213 and https://github.com/lbr-stack/lbr_fri_ros2_stack/pull/214
 
-      * Joints and links are now prefixed with ``lbr_`` (i.e. the robot name)
-      * Robot state publisher has no ``lbr/`` prefix anymore
-      * async + deactivateable FT estimation
-      * Issue with setting real-time priority fixed
-      * Modifiable source for ``lbr_system_config.yaml`` in launch files
+    * Joints and links are now prefixed with ``lbr_`` (i.e. the robot name)
+    * Robot state publisher has no ``lbr/`` prefix anymore
+    * async + deactivateable FT estimation
+    * Issue with setting real-time priority fixed
+    * Modifiable source for ``lbr_system_config.yaml`` in launch files
 
-    * https://github.com/lbr-stack/lbr_fri_ros2_stack/pull/220
+  * https://github.com/lbr-stack/lbr_fri_ros2_stack/pull/220
 
-      * PID on joint position commands replaced by simpler exponential filter (please test robot in T1 mode as this will affect your control)
-      * Introduction of twist and admittance controllers
-      * Configurations from ``lbr_ros2_control`` now in ``lbr_description`` (for stand alone URDF use)
+    * PID on joint position commands replaced by simpler exponential filter (please test robot in T1 mode as this will affect your control)
+    * Introduction of twist and admittance controllers
+    * Configurations from ``lbr_ros2_control`` now in ``lbr_description`` (for stand alone URDF use)
 
 Humble v2.1.2 (2024-10-18)
 --------------------------
