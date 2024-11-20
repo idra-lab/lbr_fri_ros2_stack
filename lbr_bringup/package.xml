@@ -19,7 +19,6 @@
   <exec_depend>lbr_ros2_control</exec_depend>
   <exec_depend>moveit_planners_chomp</exec_depend>
   <exec_depend>moveit_planners_ompl</exec_depend>
-  <exec_depend>moveit_planners_stomp</exec_depend>
   <exec_depend>moveit_ros_move_group</exec_depend>
   <exec_depend>moveit_servo</exec_depend>
   <exec_depend>rclpy</exec_depend>
