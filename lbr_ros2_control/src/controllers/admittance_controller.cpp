@@ -39,14 +39,21 @@ AdmittanceController::state_interface_configuration() const {
 controller_interface::CallbackReturn AdmittanceController::on_init() {
   try {
     this->get_node()->declare_parameter("robot_name", "lbr");
-    this->get_node()->declare_parameter("admittance.mass", 1.0);
-    this->get_node()->declare_parameter("admittance.damping", 0.1);
-    this->get_node()->declare_parameter("admittance.stiffness", 0.0);
+    this->get_node()->declare_parameter("admittance.mass",
+                                        std::vector<double>(lbr_fri_ros2::CARTESIAN_DOF, 1.0));
+    this->get_node()->declare_parameter("admittance.damping",
+                                        std::vector<double>(lbr_fri_ros2::CARTESIAN_DOF, 0.0));
+    this->get_node()->declare_parameter("admittance.stiffness",
+                                        std::vector<double>(lbr_fri_ros2::CARTESIAN_DOF, 0.0));
     this->get_node()->declare_parameter("inv_jac_ctrl.chain_root", "lbr_link_0");
     this->get_node()->declare_parameter("inv_jac_ctrl.chain_tip", "lbr_link_ee");
     this->get_node()->declare_parameter("inv_jac_ctrl.damping", 0.2);
     this->get_node()->declare_parameter("inv_jac_ctrl.max_linear_velocity", 0.1);
     this->get_node()->declare_parameter("inv_jac_ctrl.max_angular_velocity", 0.1);
+    this->get_node()->declare_parameter("inv_jac_ctrl.joint_gains",
+                                        std::vector<double>(lbr_fri_ros2::N_JNTS, 0.0));
+    this->get_node()->declare_parameter("inv_jac_ctrl.cartesian_gains",
+                                        std::vector<double>(lbr_fri_ros2::CARTESIAN_DOF, 0.0));
     configure_joint_names_();
     configure_admittance_impl_();
     configure_inv_jac_ctrl_impl_();
@@ -201,14 +208,82 @@ void AdmittanceController::configure_joint_names_() {
 }
 
 void AdmittanceController::configure_admittance_impl_() {
-  admittance_impl_ptr_ =
-      std::make_unique<lbr_fri_ros2::AdmittanceImpl>(lbr_fri_ros2::AdmittanceParameters{
-          this->get_node()->get_parameter("admittance.mass").as_double(),
-          this->get_node()->get_parameter("admittance.damping").as_double(),
-          this->get_node()->get_parameter("admittance.stiffness").as_double()});
+  if (this->get_node()->get_parameter("admittance.mass").as_double_array().size() !=
+      lbr_fri_ros2::CARTESIAN_DOF) {
+    RCLCPP_ERROR(this->get_node()->get_logger(),
+                 "Number of mass values (%ld) does not match the number of cartesian degrees of "
+                 "freedom (%d).",
+                 this->get_node()->get_parameter("admittance.mass").as_double_array().size(),
+                 lbr_fri_ros2::CARTESIAN_DOF);
+    throw std::runtime_error("Failed to configure admittance parameters.");
+  }
+  if (this->get_node()->get_parameter("admittance.damping").as_double_array().size() !=
+      lbr_fri_ros2::CARTESIAN_DOF) {
+    RCLCPP_ERROR(
+        this->get_node()->get_logger(),
+        "Number of damping values (%ld) does not match the number of cartesian degrees of freedom "
+        "(%d).",
+        this->get_node()->get_parameter("admittance.damping").as_double_array().size(),
+        lbr_fri_ros2::CARTESIAN_DOF);
+    throw std::runtime_error("Failed to configure admittance parameters.");
+  }
+  if (this->get_node()->get_parameter("admittance.stiffness").as_double_array().size() !=
+      lbr_fri_ros2::CARTESIAN_DOF) {
+    RCLCPP_ERROR(this->get_node()->get_logger(),
+                 "Number of stiffness values (%ld) does not match the number of cartesian degrees "
+                 "of freedom "
+                 "(%d).",
+                 this->get_node()->get_parameter("admittance.stiffness").as_double_array().size(),
+                 lbr_fri_ros2::CARTESIAN_DOF);
+    throw std::runtime_error("Failed to configure admittance parameters.");
+  }
+  lbr_fri_ros2::cart_array_t mass_array;
+  for (unsigned int i = 0; i < lbr_fri_ros2::CARTESIAN_DOF; ++i) {
+    mass_array[i] = this->get_node()->get_parameter("admittance.mass").as_double_array()[i];
+  }
+  lbr_fri_ros2::cart_array_t damping_array;
+  for (unsigned int i = 0; i < lbr_fri_ros2::CARTESIAN_DOF; ++i) {
+    damping_array[i] = this->get_node()->get_parameter("admittance.damping").as_double_array()[i];
+  }
+  lbr_fri_ros2::cart_array_t stiffness_array;
+  for (unsigned int i = 0; i < lbr_fri_ros2::CARTESIAN_DOF; ++i) {
+    stiffness_array[i] =
+        this->get_node()->get_parameter("admittance.stiffness").as_double_array()[i];
+  }
+  admittance_impl_ptr_ = std::make_unique<lbr_fri_ros2::AdmittanceImpl>(
+      lbr_fri_ros2::AdmittanceParameters{mass_array, damping_array, stiffness_array});
 }
 
 void AdmittanceController::configure_inv_jac_ctrl_impl_() {
+  if (this->get_node()->get_parameter("inv_jac_ctrl.joint_gains").as_double_array().size() !=
+      lbr_fri_ros2::N_JNTS) {
+    RCLCPP_ERROR(
+        this->get_node()->get_logger(),
+        "Number of joint gains (%ld) does not match the number of joints in the robot (%d).",
+        this->get_node()->get_parameter("inv_jac_ctrl.joint_gains").as_double_array().size(),
+        lbr_fri_ros2::N_JNTS);
+    throw std::runtime_error("Failed to configure joint gains.");
+  }
+  if (this->get_node()->get_parameter("inv_jac_ctrl.cartesian_gains").as_double_array().size() !=
+      lbr_fri_ros2::CARTESIAN_DOF) {
+    RCLCPP_ERROR(
+        this->get_node()->get_logger(),
+        "Number of cartesian gains (%ld) does not match the number of cartesian degrees of freedom "
+        "(%d).",
+        this->get_node()->get_parameter("inv_jac_ctrl.cartesian_gains").as_double_array().size(),
+        lbr_fri_ros2::CARTESIAN_DOF);
+    throw std::runtime_error("Failed to configure cartesian gains.");
+  }
+  lbr_fri_ros2::jnt_array_t joint_gains_array;
+  for (unsigned int i = 0; i < lbr_fri_ros2::N_JNTS; ++i) {
+    joint_gains_array[i] =
+        this->get_node()->get_parameter("inv_jac_ctrl.joint_gains").as_double_array()[i];
+  }
+  lbr_fri_ros2::cart_array_t cartesian_gains_array;
+  for (unsigned int i = 0; i < lbr_fri_ros2::CARTESIAN_DOF; ++i) {
+    cartesian_gains_array[i] =
+        this->get_node()->get_parameter("inv_jac_ctrl.cartesian_gains").as_double_array()[i];
+  }
   inv_jac_ctrl_impl_ptr_ = std::make_unique<lbr_fri_ros2::InvJacCtrlImpl>(
       this->get_robot_description(),
       lbr_fri_ros2::InvJacCtrlParameters{
@@ -217,7 +292,8 @@ void AdmittanceController::configure_inv_jac_ctrl_impl_() {
           false, // always assume twist in root frame
           this->get_node()->get_parameter("inv_jac_ctrl.damping").as_double(),
           this->get_node()->get_parameter("inv_jac_ctrl.max_linear_velocity").as_double(),
-          this->get_node()->get_parameter("inv_jac_ctrl.max_angular_velocity").as_double()});
+          this->get_node()->get_parameter("inv_jac_ctrl.max_angular_velocity").as_double(),
+          joint_gains_array, cartesian_gains_array});
 }
 
 void AdmittanceController::zero_all_values_() {

@@ -17,12 +17,14 @@
 
 namespace lbr_fri_ros2 {
 struct InvJacCtrlParameters {
-  std::string chain_root;
-  std::string chain_tip;
-  bool twist_in_tip_frame;
-  double damping;
-  double max_linear_velocity;
-  double max_angular_velocity;
+  std::string chain_root = "lbr_link_0";
+  std::string chain_tip = "lbr_link_ee";
+  bool twist_in_tip_frame = true;
+  double damping = 0.2;
+  double max_linear_velocity = 0.1;
+  double max_angular_velocity = 0.1;
+  jnt_array_t joint_gains = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+  cart_array_t cartesian_gains = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 };
 
 class InvJacCtrlImpl {
@@ -44,6 +46,7 @@ public:
 
 protected:
   void compute_impl_(const_jnt_array_t_ref q, jnt_array_t_ref dq);
+  void set_all_zero_();
 
   InvJacCtrlParameters parameters_;
 
@@ -51,26 +54,30 @@ protected:
   std::unique_ptr<Kinematics> kinematics_ptr_;
   Eigen::Matrix<double, N_JNTS, CARTESIAN_DOF> jacobian_inv_;
   Eigen::Matrix<double, CARTESIAN_DOF, 1> twist_target_;
+  Eigen::Matrix<double, N_JNTS, 1> q_gains_;
+  Eigen::Matrix<double, CARTESIAN_DOF, 1> x_gains_;
 };
 
 struct AdmittanceParameters {
   AdmittanceParameters() = delete;
-  AdmittanceParameters(const double &m = 1.0, const double &b = 0.1, const double &k = 0.0)
+  AdmittanceParameters(const_cart_array_t_ref m = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0},
+                       const_cart_array_t_ref b = {0.1, 0.1, 0.1, 0.1, 0.1, 0.1},
+                       const_cart_array_t_ref k = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0})
       : m(m), b(b), k(k) {
-    if (m <= 0.0) {
+    if (std::any_of(m.cbegin(), m.cend(), [](const double &m_i) { return m_i <= 0.0; })) {
       throw std::runtime_error("Mass must be positive and greater zero.");
     }
-    if (b < 0.0) {
+    if (std::any_of(b.cbegin(), b.cend(), [](const double &b_i) { return b_i < 0.0; })) {
       throw std::runtime_error("Damping must be positive.");
     }
-    if (k < 0.0) {
+    if (std::any_of(k.cbegin(), k.cend(), [](const double &k_i) { return k_i < 0.0; })) {
       throw std::runtime_error("Stiffness must be positive.");
     }
   }
 
-  double m = 1.0;
-  double b = 0.1;
-  double k = 0.0;
+  cart_array_t m = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
+  cart_array_t b = {0.1, 0.1, 0.1, 0.1, 0.1, 0.1};
+  cart_array_t k = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 };
 
 class AdmittanceImpl {
@@ -78,7 +85,12 @@ protected:
   static constexpr char LOGGER_NAME[] = "lbr_fri_ros2::AdmittanceImpl";
 
 public:
-  AdmittanceImpl(const AdmittanceParameters &parameters) : parameters_(parameters) {}
+  AdmittanceImpl() = delete;
+  AdmittanceImpl(const AdmittanceParameters &parameters) : parameters_(parameters) {
+    m_ = Eigen::Map<Eigen::Matrix<double, CARTESIAN_DOF, 1>>(parameters_.m.data());
+    b_ = Eigen::Map<Eigen::Matrix<double, CARTESIAN_DOF, 1>>(parameters_.b.data());
+    k_ = Eigen::Map<Eigen::Matrix<double, CARTESIAN_DOF, 1>>(parameters_.k.data());
+  }
 
   void compute(const Eigen::Matrix<double, lbr_fri_ros2::CARTESIAN_DOF, 1> &f_ext,
                const Eigen::Matrix<double, lbr_fri_ros2::CARTESIAN_DOF, 1> &x,
@@ -89,6 +101,8 @@ public:
 
 protected:
   AdmittanceParameters parameters_;
+
+  Eigen::Matrix<double, lbr_fri_ros2::CARTESIAN_DOF, 1> m_, b_, k_;
 };
 } // namespace lbr_fri_ros2
 #endif // LBR_FRI_ROS2__CONTROL_HPP_
