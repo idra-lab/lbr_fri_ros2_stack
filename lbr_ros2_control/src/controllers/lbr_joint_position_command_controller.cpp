@@ -49,7 +49,8 @@ LBRJointPositionCommandController::update(const rclcpp::Time & /*time*/,
   }
   std::for_each(command_interfaces_.begin(), command_interfaces_.end(),
                 [lbr_joint_position_command, idx = 0](auto &command_interface) mutable {
-                  command_interface.set_value((*lbr_joint_position_command)->joint_position[++idx]);
+                  command_interface.set_value((*lbr_joint_position_command)->joint_position[idx]);
+                  ++idx;
                 });
   return controller_interface::return_type::OK;
 }
