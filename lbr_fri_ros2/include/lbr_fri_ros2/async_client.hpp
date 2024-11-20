@@ -11,7 +11,6 @@
 #include "friClientVersion.h"
 #include "friLBRClient.h"
 
-#include "lbr_fri_ros2/filters.hpp"
 #include "lbr_fri_ros2/formatting.hpp"
 #include "lbr_fri_ros2/interfaces/base_command.hpp"
 #include "lbr_fri_ros2/interfaces/position_command.hpp"
@@ -27,10 +26,10 @@ protected:
 public:
   AsyncClient() = delete;
   AsyncClient(const KUKA::FRI::EClientCommandMode &client_command_mode,
-              const PIDParameters &pid_parameters,
+              const double &joint_position_tau,
               const CommandGuardParameters &command_guard_parameters,
               const std::string &command_guard_variant,
-              const StateInterfaceParameters &state_interface_parameters = {10.0, 10.0},
+              const StateInterfaceParameters &state_interface_parameters = {0.04, 0.04},
               const bool &open_loop = true);
 
   inline std::shared_ptr<BaseCommandInterface> get_command_interface() {

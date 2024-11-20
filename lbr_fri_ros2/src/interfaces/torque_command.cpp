@@ -2,9 +2,9 @@
 
 namespace lbr_fri_ros2 {
 TorqueCommandInterface::TorqueCommandInterface(
-    const PIDParameters &pid_parameters, const CommandGuardParameters &command_guard_parameters,
+    const double &joint_position_tau, const CommandGuardParameters &command_guard_parameters,
     const std::string &command_guard_variant)
-    : BaseCommandInterface(pid_parameters, command_guard_parameters, command_guard_variant) {}
+    : BaseCommandInterface(joint_position_tau, command_guard_parameters, command_guard_variant) {}
 
 void TorqueCommandInterface::buffered_command_to_fri(fri_command_t_ref command,
                                                      const_idl_state_t_ref state) {
@@ -30,12 +30,11 @@ void TorqueCommandInterface::buffered_command_to_fri(fri_command_t_ref command,
     throw std::runtime_error(err);
   }
 
-  // PID
-  joint_position_pid_.compute(
-      command_target_.joint_position, state.measured_joint_position,
-      std::chrono::nanoseconds(static_cast<int64_t>(state.sample_time * 1.e9)),
-      command_.joint_position);
-  command_.torque = command_target_.torque;
+  // exponential smooth
+  if (!joint_position_filter_.is_initialized()) {
+    joint_position_filter_.initialize(state.sample_time);
+  }
+  joint_position_filter_.compute(command_target_.joint_position, command_.joint_position);
 
   // validate
   if (!command_guard_->is_valid_command(command_, state)) {
