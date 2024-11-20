@@ -41,6 +41,10 @@ controller_interface::CallbackReturn TwistController::on_init() {
     this->get_node()->declare_parameter("inv_jac_ctrl.damping", 0.2);
     this->get_node()->declare_parameter("inv_jac_ctrl.max_linear_velocity", 0.1);
     this->get_node()->declare_parameter("inv_jac_ctrl.max_angular_velocity", 0.1);
+    this->get_node()->declare_parameter("inv_jac_ctrl.joint_gains",
+                                        std::vector<double>(lbr_fri_ros2::N_JNTS, 0.0));
+    this->get_node()->declare_parameter("inv_jac_ctrl.cartesian_gains",
+                                        std::vector<double>(lbr_fri_ros2::CARTESIAN_DOF, 0.0));
     this->get_node()->declare_parameter("timeout", 0.2);
     configure_joint_names_();
     configure_inv_jac_ctrl_impl_();
@@ -166,6 +170,35 @@ void TwistController::configure_joint_names_() {
 }
 
 void TwistController::configure_inv_jac_ctrl_impl_() {
+  if (this->get_node()->get_parameter("inv_jac_ctrl.joint_gains").as_double_array().size() !=
+      lbr_fri_ros2::N_JNTS) {
+    RCLCPP_ERROR(
+        this->get_node()->get_logger(),
+        "Number of joint gains (%ld) does not match the number of joints in the robot (%d).",
+        this->get_node()->get_parameter("inv_jac_ctrl.joint_gains").as_double_array().size(),
+        lbr_fri_ros2::N_JNTS);
+    throw std::runtime_error("Failed to configure joint gains.");
+  }
+  if (this->get_node()->get_parameter("inv_jac_ctrl.cartesian_gains").as_double_array().size() !=
+      lbr_fri_ros2::CARTESIAN_DOF) {
+    RCLCPP_ERROR(
+        this->get_node()->get_logger(),
+        "Number of cartesian gains (%ld) does not match the number of cartesian degrees of freedom "
+        "(%d).",
+        this->get_node()->get_parameter("inv_jac_ctrl.cartesian_gains").as_double_array().size(),
+        lbr_fri_ros2::CARTESIAN_DOF);
+    throw std::runtime_error("Failed to configure cartesian gains.");
+  }
+  lbr_fri_ros2::jnt_array_t joint_gains_array;
+  for (unsigned int i = 0; i < lbr_fri_ros2::N_JNTS; ++i) {
+    joint_gains_array[i] =
+        this->get_node()->get_parameter("inv_jac_ctrl.joint_gains").as_double_array()[i];
+  }
+  lbr_fri_ros2::cart_array_t cartesian_gains_array;
+  for (unsigned int i = 0; i < lbr_fri_ros2::CARTESIAN_DOF; ++i) {
+    cartesian_gains_array[i] =
+        this->get_node()->get_parameter("inv_jac_ctrl.cartesian_gains").as_double_array()[i];
+  }
   inv_jac_ctrl_impl_ptr_ = std::make_unique<lbr_fri_ros2::InvJacCtrlImpl>(
       this->get_robot_description(),
       lbr_fri_ros2::InvJacCtrlParameters{
@@ -174,7 +207,8 @@ void TwistController::configure_inv_jac_ctrl_impl_() {
           this->get_node()->get_parameter("inv_jac_ctrl.twist_in_tip_frame").as_bool(),
           this->get_node()->get_parameter("inv_jac_ctrl.damping").as_double(),
           this->get_node()->get_parameter("inv_jac_ctrl.max_linear_velocity").as_double(),
-          this->get_node()->get_parameter("inv_jac_ctrl.max_angular_velocity").as_double()});
+          this->get_node()->get_parameter("inv_jac_ctrl.max_angular_velocity").as_double(),
+          joint_gains_array, cartesian_gains_array});
 }
 
 void TwistController::log_info_() const { inv_jac_ctrl_impl_ptr_->log_info(); }

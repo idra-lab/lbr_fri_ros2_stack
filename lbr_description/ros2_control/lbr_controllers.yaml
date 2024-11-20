@@ -97,15 +97,17 @@
   ros__parameters:
     robot_name: lbr
     admittance:
-      mass: 0.01
-      damping: 1.0
-      stiffness: 0.0
+      mass: [0.01, 0.01, 0.01, 0.01, 0.01, 0.01]
+      damping: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+      stiffness: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     inv_jac_ctrl:
       chain_root: lbr_link_0
       chain_tip: lbr_link_ee
       damping: 0.2 # damping factor for the pseudo-inverse of the Jacobian
       max_linear_velocity: 2.0 # maximum linear velocity
       max_angular_velocity: 2.0 # maximum linear acceleration
+      joint_gains: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0] # joint gains
+      cartesian_gains: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0] # cartesian gains
 
 /**/twist_controller:
   ros__parameters:
@@ -117,4 +119,6 @@
       damping: 0.2 # damping factor for the pseudo-inverse of the Jacobian
       max_linear_velocity: 0.1 # maximum linear velocity
       max_angular_velocity: 0.1 # maximum linear acceleration
+      joint_gains: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0] # joint gains
+      cartesian_gains: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0] # cartesian gains
     timeout: 0.2 # stop controller if no command is received within this time [s]
