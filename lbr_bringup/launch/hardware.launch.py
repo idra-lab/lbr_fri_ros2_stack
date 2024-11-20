@@ -39,7 +39,9 @@ def generate_launch_description() -> LaunchDescription:
     ld.add_action(robot_state_publisher)
 
     # ros2 control node
-    ros2_control_node = LBRROS2ControlMixin.node_ros2_control(use_sim_time=False)
+    ros2_control_node = LBRROS2ControlMixin.node_ros2_control(
+        use_sim_time=False, robot_description=robot_description
+    )
     ld.add_action(ros2_control_node)
 
     # joint state broad caster and controller on ros2 control node start

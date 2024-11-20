@@ -52,6 +52,9 @@ protected:
   void zero_all_values_();
   void log_info_() const;
 
+  // robot description
+  std::string robot_description_;
+
   // admittance
   bool initialized_ = false;
   std::unique_ptr<lbr_fri_ros2::AdmittanceImpl> admittance_impl_ptr_;

@@ -28,7 +28,9 @@ controller_interface::CallbackReturn LBRTorqueCommandController::on_init() {
             "command/torque", 1, [this](const lbr_fri_idl::msg::LBRTorqueCommand::SharedPtr msg) {
               rt_lbr_torque_command_ptr_.writeFromNonRT(msg);
             });
-    this->get_node()->declare_parameter("robot_name", "lbr");
+    if (!this->get_node()->has_parameter("robot_name")) {
+      this->get_node()->declare_parameter("robot_name", "lbr");
+    }
     configure_joint_names_();
   } catch (const std::exception &e) {
     RCLCPP_ERROR(this->get_node()->get_logger(),

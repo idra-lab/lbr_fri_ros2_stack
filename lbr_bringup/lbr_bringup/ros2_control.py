@@ -72,6 +72,9 @@ class LBRROS2ControlMixin:
         use_sim_time: Optional[Union[LaunchConfiguration, bool]] = LaunchConfiguration(
             "use_sim_time", default="false"
         ),
+        robot_description: Optional[
+            Dict[str, str]
+        ] = {},  # required for certain ROS 2 controllers in Humble
         **kwargs,
     ) -> Node:
         return Node(
@@ -91,6 +94,7 @@ class LBRROS2ControlMixin:
                         ),
                     ]
                 ),
+                robot_description,
             ],
             namespace=robot_name,
             remappings=[

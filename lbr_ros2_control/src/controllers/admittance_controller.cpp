@@ -38,22 +38,51 @@ AdmittanceController::state_interface_configuration() const {
 
 controller_interface::CallbackReturn AdmittanceController::on_init() {
   try {
-    this->get_node()->declare_parameter("robot_name", "lbr");
-    this->get_node()->declare_parameter("admittance.mass",
-                                        std::vector<double>(lbr_fri_ros2::CARTESIAN_DOF, 1.0));
-    this->get_node()->declare_parameter("admittance.damping",
-                                        std::vector<double>(lbr_fri_ros2::CARTESIAN_DOF, 0.0));
-    this->get_node()->declare_parameter("admittance.stiffness",
-                                        std::vector<double>(lbr_fri_ros2::CARTESIAN_DOF, 0.0));
-    this->get_node()->declare_parameter("inv_jac_ctrl.chain_root", "lbr_link_0");
-    this->get_node()->declare_parameter("inv_jac_ctrl.chain_tip", "lbr_link_ee");
-    this->get_node()->declare_parameter("inv_jac_ctrl.damping", 0.2);
-    this->get_node()->declare_parameter("inv_jac_ctrl.max_linear_velocity", 0.1);
-    this->get_node()->declare_parameter("inv_jac_ctrl.max_angular_velocity", 0.1);
-    this->get_node()->declare_parameter("inv_jac_ctrl.joint_gains",
-                                        std::vector<double>(lbr_fri_ros2::N_JNTS, 0.0));
-    this->get_node()->declare_parameter("inv_jac_ctrl.cartesian_gains",
-                                        std::vector<double>(lbr_fri_ros2::CARTESIAN_DOF, 0.0));
+    if (!this->get_node()->has_parameter("robot_description")) {
+      this->get_node()->declare_parameter("robot_description", "");
+    }
+    if (!this->get_node()->has_parameter("robot_name")) {
+      this->get_node()->declare_parameter("robot_name", "lbr");
+    }
+    if (!this->get_node()->has_parameter("admittance.mass")) {
+      this->get_node()->declare_parameter("admittance.mass",
+                                          std::vector<double>(lbr_fri_ros2::CARTESIAN_DOF, 1.0));
+    }
+    if (!this->get_node()->has_parameter("admittance.damping")) {
+      this->get_node()->declare_parameter("admittance.damping",
+                                          std::vector<double>(lbr_fri_ros2::CARTESIAN_DOF, 0.0));
+    }
+    if (!this->get_node()->has_parameter("admittance.stiffness")) {
+      this->get_node()->declare_parameter("admittance.stiffness",
+                                          std::vector<double>(lbr_fri_ros2::CARTESIAN_DOF, 0.0));
+    }
+    if (!this->get_node()->has_parameter("inv_jac_ctrl.chain_root")) {
+      this->get_node()->declare_parameter("inv_jac_ctrl.chain_root", "lbr_link_0");
+    }
+    if (!this->get_node()->has_parameter("inv_jac_ctrl.chain_tip")) {
+      this->get_node()->declare_parameter("inv_jac_ctrl.chain_tip", "lbr_link_ee");
+    }
+    if (!this->get_node()->has_parameter("inv_jac_ctrl.damping")) {
+      this->get_node()->declare_parameter("inv_jac_ctrl.damping", 0.2);
+    }
+    if (!this->get_node()->has_parameter("inv_jac_ctrl.max_linear_velocity")) {
+      this->get_node()->declare_parameter("inv_jac_ctrl.max_linear_velocity", 0.1);
+    }
+    if (!this->get_node()->has_parameter("inv_jac_ctrl.max_angular_velocity")) {
+      this->get_node()->declare_parameter("inv_jac_ctrl.max_angular_velocity", 0.1);
+    }
+    if (!this->get_node()->has_parameter("inv_jac_ctrl.joint_gains")) {
+      this->get_node()->declare_parameter("inv_jac_ctrl.joint_gains",
+                                          std::vector<double>(lbr_fri_ros2::N_JNTS, 0.0));
+    }
+    if (!this->get_node()->has_parameter("inv_jac_ctrl.cartesian_gains")) {
+      this->get_node()->declare_parameter("inv_jac_ctrl.cartesian_gains",
+                                          std::vector<double>(lbr_fri_ros2::CARTESIAN_DOF, 0.0));
+    }
+    robot_description_ = this->get_node()->get_parameter("robot_description").as_string();
+    if (robot_description_.empty()) {
+      throw std::runtime_error("No robot description provided");
+    }
     configure_joint_names_();
     configure_admittance_impl_();
     configure_inv_jac_ctrl_impl_();
@@ -285,7 +314,7 @@ void AdmittanceController::configure_inv_jac_ctrl_impl_() {
         this->get_node()->get_parameter("inv_jac_ctrl.cartesian_gains").as_double_array()[i];
   }
   inv_jac_ctrl_impl_ptr_ = std::make_unique<lbr_fri_ros2::InvJacCtrlImpl>(
-      this->get_robot_description(),
+      robot_description_,
       lbr_fri_ros2::InvJacCtrlParameters{
           this->get_node()->get_parameter("inv_jac_ctrl.chain_root").as_string(),
           this->get_node()->get_parameter("inv_jac_ctrl.chain_tip").as_string(),

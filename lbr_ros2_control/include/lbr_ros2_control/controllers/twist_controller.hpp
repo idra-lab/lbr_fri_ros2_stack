@@ -54,6 +54,9 @@ protected:
   void configure_inv_jac_ctrl_impl_();
   void log_info_() const;
 
+  // robot description
+  std::string robot_description_;
+
   // some safety checks
   std::atomic<int> updates_since_last_command_ = 0;
   double timeout_ = 0.2;

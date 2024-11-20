@@ -21,7 +21,9 @@ controller_interface::CallbackReturn LBRStateBroadcaster::on_init() {
     rt_state_publisher_ptr_ =
         std::make_shared<realtime_tools::RealtimePublisher<lbr_fri_idl::msg::LBRState>>(
             state_publisher_ptr_);
-    this->get_node()->declare_parameter("robot_name", "lbr");
+    if (!this->get_node()->has_parameter("robot_name")) {
+      this->get_node()->declare_parameter("robot_name", "lbr");
+    }
     configure_joint_names_();
   } catch (const std::exception &e) {
     RCLCPP_ERROR(this->get_node()->get_logger(),
