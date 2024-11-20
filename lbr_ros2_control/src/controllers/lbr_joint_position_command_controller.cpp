@@ -49,10 +49,13 @@ LBRJointPositionCommandController::update(const rclcpp::Time & /*time*/,
   if (!lbr_joint_position_command || !(*lbr_joint_position_command)) {
     return controller_interface::return_type::OK;
   }
-  std::for_each(command_interfaces_.begin(), command_interfaces_.end(),
-                [lbr_joint_position_command, idx = 0](auto &command_interface) mutable {
-                  command_interface.set_value((*lbr_joint_position_command)->joint_position[++idx]);
-                });
+  std::for_each(
+      command_interfaces_.begin(), command_interfaces_.end(),
+      [lbr_joint_position_command, idx = 0](auto &command_interface) mutable {
+        command_interface.set_value(
+            (*lbr_joint_position_command)
+                ->joint_position[idx++]); // important to post-increment idx, don't use ++idx
+      });
   return controller_interface::return_type::OK;
 }
 
