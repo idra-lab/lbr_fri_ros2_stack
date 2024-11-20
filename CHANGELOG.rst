@@ -11,7 +11,7 @@ This release backports new ``rolling`` features to ``humble``. Following has cha
 
     * Joints and links are now prefixed with ``lbr_`` (i.e. the robot name)
     * Robot state publisher has no ``lbr/`` prefix anymore
-    * async + deactivateable FT estimation
+    * Asynchronous + deactivateable force-torque estimation from external torques (previously synchronous)
     * Issue with setting real-time priority fixed
     * Modifiable source for ``lbr_system_config.yaml`` in launch files
 
