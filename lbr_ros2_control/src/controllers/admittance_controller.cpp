@@ -112,26 +112,38 @@ controller_interface::return_type AdmittanceController::update(const rclcpp::Tim
 
   // compute forward kinematics
   auto chain_tip_frame = inv_jac_ctrl_impl_ptr_->get_kinematics_ptr()->compute_fk(q_);
-  x_.head(3) = Eigen::Map<Eigen::Matrix<double, 3, 1>>(chain_tip_frame.p.data);
-  x_.tail(3) = Eigen::Map<Eigen::Matrix<double, 3, 1>>(chain_tip_frame.M.GetRot().data);
+  t_ = Eigen::Map<Eigen::Matrix<double, 3, 1>>(chain_tip_frame.p.data);
+  r_ = Eigen::Quaterniond(chain_tip_frame.M.data);
 
   // compute steady state position and orientation
   if (!initialized_) {
-    x_init_ = x_;
-    x_prev_ = x_;
+    t_init_ = t_;
+    t_prev_ = t_init_;
+    r_init_ = r_;
+    r_prev_ = r_init_;
     initialized_ = true;
   }
 
-  // compute velocity & update previous position
-  dx_ = (x_ - x_prev_) / period.seconds();
-  x_prev_ = x_;
+  // compute translational delta and velocity
+  delta_x_.head(3) = (t_ - t_init_);
+  dx_.head(3) = (t_ - t_prev_) / period.seconds();
+
+  // compute rotational delta and veloctity
+  Eigen::AngleAxisd deltaa(r_.inverse() * r_init_);
+  delta_x_.tail(4) = deltaa.axis() * deltaa.angle();
+  Eigen::AngleAxisd da(r_.inverse() * r_prev_);
+  dx_.tail(3) = da.axis() * da.angle();
+
+  // update previous values
+  t_prev_ = t_;
+  r_prev_ = r_;
 
   // convert f_ext_ back to root frame
   f_ext_.head(3) = Eigen::Matrix3d::Map(chain_tip_frame.M.data).transpose() * f_ext_.head(3);
   f_ext_.tail(3) = Eigen::Matrix3d::Map(chain_tip_frame.M.data).transpose() * f_ext_.tail(3);
 
   // compute admittance
-  admittance_impl_ptr_->compute(f_ext_, x_ - x_init_, dx_, ddx_);
+  admittance_impl_ptr_->compute(f_ext_, delta_x_, dx_, ddx_);
 
   // integrate ddx_ to command velocity
   twist_command_ = ddx_ * period.seconds();
@@ -327,7 +339,7 @@ void AdmittanceController::configure_inv_jac_ctrl_impl_() {
 
 void AdmittanceController::zero_all_values_() {
   f_ext_.setZero();
-  x_.setZero();
+  delta_x_.setZero();
   dx_.setZero();
   ddx_.setZero();
   std::fill(dq_.begin(), dq_.end(), 0.0);
