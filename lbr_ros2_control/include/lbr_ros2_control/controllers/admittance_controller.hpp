@@ -10,6 +10,7 @@
 
 #include "controller_interface/controller_interface.hpp"
 #include "eigen3/Eigen/Core"
+#include "eigen3/Eigen/Geometry"
 #include "hardware_interface/loaned_state_interface.hpp"
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
 #include "rclcpp/rclcpp.hpp"
@@ -55,8 +56,9 @@ protected:
   // admittance
   bool initialized_ = false;
   std::unique_ptr<lbr_fri_ros2::AdmittanceImpl> admittance_impl_ptr_;
-  Eigen::Matrix<double, lbr_fri_ros2::CARTESIAN_DOF, 1> x_init_, x_prev_;
-  Eigen::Matrix<double, lbr_fri_ros2::CARTESIAN_DOF, 1> f_ext_, x_, dx_, ddx_;
+  Eigen::Matrix<double, 3, 1> t_init_, t_, t_prev_; // translation
+  Eigen::Quaterniond r_init_, r_, r_prev_;          // rotation
+  Eigen::Matrix<double, lbr_fri_ros2::CARTESIAN_DOF, 1> f_ext_, delta_x_, dx_, ddx_;
 
   // joint veloctiy computation
   std::unique_ptr<lbr_fri_ros2::InvJacCtrlImpl> inv_jac_ctrl_impl_ptr_;
