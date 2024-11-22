@@ -37,6 +37,18 @@ AdmittanceController::state_interface_configuration() const {
 }
 
 controller_interface::CallbackReturn AdmittanceController::on_init() {
+  RCLCPP_ERROR(
+      this->get_node()->get_logger(),
+      "The admittance controller currently requires custom lbr_system_config.yaml configurations. "
+      "Therefore, only experienced users should use it, then remove this error and strictly "
+      "follow "
+      "https://lbr-stack.readthedocs.io/en/latest/lbr_fri_ros2_stack/lbr_demos/"
+      "lbr_demos_advanced_cpp/doc/lbr_demos_advanced_cpp.html#admittance-controller. "
+      "This error can be removed when a) the controller works with default system configurations "
+      "and b) the "
+      "controller checks that load data was successfully calibrated.");
+  return controller_interface::CallbackReturn::ERROR;
+
   try {
     if (!this->get_node()->has_parameter("robot_description")) {
       this->get_node()->declare_parameter("robot_description", "");
