@@ -62,12 +62,11 @@ Full documentation available on [Read the Docs](https://lbr-stack.readthedocs.io
     colcon build --symlink-install
     ```
 
-4. In terminal 1, launch a mock setup via
+4. In terminal 1, launch a the real setup via
 
     ```shell
     source install/setup.bash
-    ros2 launch lbr_bringup mock.launch.py \
-        model:=iiwa7 # [iiwa7, iiwa14, med7, med14]
+    ros2 launch lbr_bringup hardware.launch.py ctrl:=cartesian_impedance_controller
     ```
 
 > [!TIP]
@@ -79,10 +78,13 @@ Full documentation available on [Read the Docs](https://lbr-stack.readthedocs.io
     source install/setup.bash
     ros2 launch lbr_bringup rviz.launch.py \
         rviz_cfg_pkg:=lbr_bringup \
-        rviz_cfg:=config/mock.rviz
+        rviz_cfg:=config/hardware.rviz
     ```
 
 Now, run the [demos](https://lbr-stack.readthedocs.io/en/latest/lbr_fri_ros2_stack/lbr_demos/doc/lbr_demos.html). To get started with the real robot, checkout the [Hardware Setup](https://lbr-stack.readthedocs.io/en/latest/lbr_fri_ros2_stack/lbr_fri_ros2_stack/doc/hardware_setup.html).
+
+## Important note
+If you experience `ILLEGAL AXIS DELTA DETECTED` on the teach pendant, make sure that `open_loop` is set to `false` in `lbr_system_config.yaml`
 
 ## Citation
 If you enjoyed using this repository for your work, we would really appreciate ❤️ if you could leave a ⭐ and / or cite it, as it helps us to continue offering support.
