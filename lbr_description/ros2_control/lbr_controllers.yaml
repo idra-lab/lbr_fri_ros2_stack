@@ -2,7 +2,7 @@
 # managers regardless of their namespace. Usefull in multi-robot setups.
 /**/controller_manager:
   ros__parameters:
-    update_rate: 100
+    update_rate: 1000
 
     # ROS 2 control broadcasters
     joint_state_broadcaster:
@@ -23,9 +23,6 @@
       type: position_controllers/JointGroupPositionController
 
     # LBR ROS 2 control controllers
-    admittance_controller:
-      type: lbr_ros2_control/AdmittanceController
-
     lbr_joint_position_command_controller:
       type: lbr_ros2_control/LBRJointPositionCommandController
 
@@ -35,21 +32,20 @@
     lbr_wrench_command_controller:
       type: lbr_ros2_control/LBRWrenchCommandController
 
-    twist_controller:
-      type: lbr_ros2_control/TwistController
+    cartesian_impedance_controller:
+      type: cartesian_impedance_controller/CartesianImpedanceController
 
-# ROS 2 control broadcasters
+    gravity_compensation:
+      type: gravity_compensation/GravityCompensation
+
+    motion_control_handle:
+      type: cartesian_controller_handles/MotionControlHandle
+
 /**/force_torque_broadcaster:
   ros__parameters:
-    frame_id: lbr_link_ee # namespace: https://github.com/ros2/rviz/issues/1103
+    frame_id: lbr/lbr_link_ee # namespace: https://github.com/ros2/rviz/issues/1103
     sensor_name: estimated_ft_sensor
 
-# LBR ROS 2 control broadcasters
-/**/lbr_state_broadcaster:
-  ros__parameters:
-    robot_name: lbr
-
-# ROS 2 control controllers
 /**/joint_trajectory_controller:
   ros__parameters:
     joints:
@@ -80,45 +76,89 @@
       - lbr_A7
     interface_name: position
 
-# LBR ROS 2 control controllers
-/**/lbr_joint_position_command_controller:
+/**/cartesian_impedance_controller:
   ros__parameters:
-    robot_name: lbr
+    kuka: true
+    # This is the tip of the robot tool that you usually use for your task.
+    # For instance, it could be the drilling bit of a screwdriver or a grinding
+    # tool.  When you specify a target_wrench, i.e. some additional forces that
+    # your robot should apply to its environment, that target_wrench gets
+    # applied in this frame.
+    end_effector_link: "lbr_link_ee"
 
-/**/lbr_torque_command_controller:
-  ros__parameters:
-    robot_name: lbr
+    # This is usually the link directly before the first actuated joint.  All
+    # controllers will build a kinematic chain from this link up to
+    # end_effector_link.  It's also the reference frame for the superposition
+    # of error components in all controllers.
+    robot_base_link: "lbr_link_0"
 
-/**/lbr_wrench_command_controller:
-  ros__parameters:
-    robot_name: lbr
+    # This is the URDF link of your sensor. Sensor signals are assumed to be
+    # given in this frame.  It's important that this link is located somewhere
+    # between end_effector_link and robot_base_link.  If that's not the case,
+    # the controllers won't initialize and will emit an error message.
+    ft_sensor_ref_link: "lbr_link_ee"
 
-/**/admittance_controller:
-  ros__parameters:
-    robot_name: lbr
-    admittance:
-      mass: [0.01, 0.01, 0.01, 0.01, 0.01, 0.01]
-      damping: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
-      stiffness: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-    inv_jac_ctrl:
-      chain_root: lbr_link_0
-      chain_tip: lbr_link_ee
-      damping: 0.2 # damping factor for the pseudo-inverse of the Jacobian
-      max_linear_velocity: 2.0 # maximum linear velocity
-      max_angular_velocity: 2.0 # maximum linear acceleration
-      joint_gains: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0] # joint gains
-      cartesian_gains: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0] # cartesian gains
+    # This is the link that the robot feels compliant about. It does not need
+    # to coincide with the end_effector_link, but for many use cases, this
+    # configuration is handy. When working with a screwdriver, for instance, 
+    # setting compliance_ref_link == end_effector_link makes it easy to specify
+    # downward pushing forces without generating unwanted offset moments.
+    # On the other hand, an application could benefit from yielding a little in
+    # the robot's wrist while drawing a line on a surface with a pen.
+    compliance_ref_link: "lbr_link_ee"
 
-/**/twist_controller:
+    command_interfaces:
+      - effort
+    state_interfaces:
+      - position
+      - velocity
+    joints:
+      - lbr_A1
+      - lbr_A2
+      - lbr_A3
+      - lbr_A4
+      - lbr_A5
+      - lbr_A6
+      - lbr_A7
+    delta_tau_max: 1.0 # Nm
+    stiffness:  # w.r.t. compliance_ref_link coordinates
+        trans_x: 1500.0
+        trans_y: 1500.0
+        trans_z: 1500.0
+        rot_x: 200.0
+        rot_y: 200.0
+        rot_z: 200.0
+    
+/**/motion_control_handle:
   ros__parameters:
-    robot_name: lbr
-    inv_jac_ctrl:
-      chain_root: lbr_link_0
-      chain_tip: lbr_link_ee
-      twist_in_tip_frame: true # if true, the twist command is expressed in the tip frame, otherwise in the root frame
-      damping: 0.2 # damping factor for the pseudo-inverse of the Jacobian
-      max_linear_velocity: 0.1 # maximum linear velocity
-      max_angular_velocity: 0.1 # maximum linear acceleration
-      joint_gains: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0] # joint gains
-      cartesian_gains: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0] # cartesian gains
-    timeout: 0.2 # stop controller if no command is received within this time [s]
+    end_effector_link: "lbr_link_ee"
+    robot_base_link: "lbr_link_0"
+    ft_sensor_ref_link: "lbr_link_ee"
+    joints:
+      - lbr_A1
+      - lbr_A2
+      - lbr_A3
+      - lbr_A4
+      - lbr_A5
+      - lbr_A6
+      - lbr_A7
+
+/**/gravity_compensation:
+  ros__parameters:
+    end_effector_link: "lbr_link_ee"
+    robot_base_link: "lbr_link_0"
+    ft_sensor_ref_link: "lbr_link_ee"
+    command_interfaces:
+      - effort
+    state_interfaces:
+      - position
+      - velocity
+    joints:
+      - lbr_A1
+      - lbr_A2
+      - lbr_A3
+      - lbr_A4
+      - lbr_A5
+      - lbr_A6
+      - lbr_A7
+    kuka: true

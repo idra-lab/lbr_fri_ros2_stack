@@ -37,6 +37,8 @@ class LBRROS2ControlMixin:
                 "lbr_torque_command_controller",
                 "lbr_wrench_command_controller",
                 "twist_controller",
+                "cartesian_impedance_controller",
+                "gravity_compensation"
             ],
         )
 
@@ -99,6 +101,7 @@ class LBRROS2ControlMixin:
             namespace=robot_name,
             remappings=[
                 ("~/robot_description", "robot_description"),
+                ('motion_control_handle/target_frame', 'cartesian_impedance_controller/target_frame'),
             ],
             **kwargs,
         )
