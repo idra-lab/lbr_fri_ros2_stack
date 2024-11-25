@@ -292,5 +292,14 @@
 
         <link name="link_ee">
         </link>
+
+        <joint name="joint_tool" type="fixed">
+            <parent link="link_ee" />
+            <child link="link_tool" />
+            <origin xyz="0 0 0.01" rpy="0 0 0" />
+        </joint>
+
+        <link name="link_tool">
+        </link>
     </xacro:macro>
 </robot>

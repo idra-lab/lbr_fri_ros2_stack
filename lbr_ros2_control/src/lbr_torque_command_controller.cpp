@@ -80,6 +80,14 @@ bool LBRTorqueCommandController::reference_command_interfaces_() {
       torque_command_interfaces_.emplace_back(std::ref(command_interface));
     }
   }
+  // Print command interfaces
+  RCLCPP_INFO(this->get_node()->get_logger(), "Command interfaces:");
+  for (const auto &joint_position_command_interface : joint_position_command_interfaces_) {
+    RCLCPP_INFO(this->get_node()->get_logger(), "  %s", joint_position_command_interface.get().get_name());
+  }
+  for (const auto &torque_command_interface : torque_command_interfaces_) {
+    RCLCPP_INFO(this->get_node()->get_logger(), "  %s", torque_command_interface.get().get_name());
+  }
   if (joint_position_command_interfaces_.size() != KUKA::FRI::LBRState::NUMBER_OF_JOINTS) {
     RCLCPP_ERROR(
         this->get_node()->get_logger(),

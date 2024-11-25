@@ -31,15 +31,17 @@ void TorqueCommandInterface::buffered_command_to_fri(fri_command_t_ref command,
   }
 
   // PID
-  if (!joint_position_pid_.is_initialized()) {
-    joint_position_pid_.initialize(pid_parameters_, state.sample_time);
-  }
-  joint_position_pid_.compute(
-      command_target_.joint_position, state.measured_joint_position,
-      std::chrono::nanoseconds(static_cast<int64_t>(state.sample_time * 1.e9)),
-      command_.joint_position);
+  // if (!joint_position_pid_.is_initialized()) {
+  //   joint_position_pid_.initialize(pid_parameters_, state.sample_time);
+  // }
+  // joint_position_pid_.compute(
+  //     command_target_.joint_position, state.measured_joint_position,
+  //     std::chrono::nanoseconds(static_cast<int64_t>(state.sample_time * 1.e9)),
+  //     command_.joint_position);
+  
   command_.torque = command_target_.torque;
-
+  command_.joint_position = command_target_.joint_position;
+  // RCLCPP_INFO_STREAM(rclcpp::get_logger(LOGGER_NAME()), "Command: " << command_.torque.data()[0]<< " " << command_.torque.data()[1]<< " " << command_.torque.data()[2]<< " " << command_.torque.data()[3]<< " " << command_.torque.data()[4]<< " " << command_.torque.data()[5]<< " " << command_.torque.data()[6]);
   // validate
   if (!command_guard_->is_valid_command(command_, state)) {
     std::string err = "Invalid command.";

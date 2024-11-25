@@ -14,7 +14,7 @@
 #include "lbr_fri_ros2/utils.hpp"
 
 class TorqueSineOverlay {
-  static constexpr double amplitude_ = 15.;  // Nm
+  static constexpr double amplitude_ = 0.5;  // Nm
   static constexpr double frequency_ = 0.25; // Hz
 
 public:

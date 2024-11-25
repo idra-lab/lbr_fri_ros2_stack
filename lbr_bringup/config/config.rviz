@@ -9,6 +9,7 @@ Panels:
         - /RobotModel1
         - /RobotModel1/Description Topic1
         - /Wrench1
+        - /InteractiveMarkers1
       Splitter Ratio: 0.40760868787765503
     Tree Height: 724
   - Class: rviz_common/Selection
@@ -143,6 +144,15 @@ Visualization Manager:
       Torque Arrow Scale: 0.30000001192092896
       Torque Color: 170; 85; 255
       Value: true
+    - Class: rviz_default_plugins/InteractiveMarkers
+      Enable Transparency: true
+      Enabled: true
+      Interactive Markers Namespace: /lbr/motion_control_handle
+      Name: InteractiveMarkers
+      Show Axes: false
+      Show Descriptions: true
+      Show Visual Aids: false
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 21; 21; 26
@@ -225,5 +235,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1850
-  X: 1080
-  Y: 450
+  X: 710
+  Y: 382
