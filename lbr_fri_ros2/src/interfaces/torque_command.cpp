@@ -36,6 +36,9 @@ void TorqueCommandInterface::buffered_command_to_fri(fri_command_t_ref command,
   }
   joint_position_filter_.compute(command_target_.joint_position, command_.joint_position);
 
+  command_.torque = command_target_.torque;
+  command_.joint_position = command_target_.joint_position;
+
   // validate
   if (!command_guard_->is_valid_command(command_, state)) {
     std::string err = "Invalid command.";
