@@ -41,7 +41,7 @@ class LBRROS2ControlMixin:
                 "gravity_compensation"
             ],
         )
-
+    
     @staticmethod
     def arg_sys_cfg_pkg() -> DeclareLaunchArgument:
         return DeclareLaunchArgument(
@@ -68,6 +68,7 @@ class LBRROS2ControlMixin:
 
     @staticmethod
     def node_ros2_control(
+        robot_description: Dict[str, str],
         robot_name: Optional[Union[LaunchConfiguration, str]] = LaunchConfiguration(
             "robot_name", default="lbr"
         ),
@@ -83,7 +84,8 @@ class LBRROS2ControlMixin:
             package="controller_manager",
             executable="ros2_control_node",
             parameters=[
-                {"use_sim_time": use_sim_time},
+                robot_description,
+                {"use_sim_time": False},
                 PathJoinSubstitution(
                     [
                         FindPackageShare(
@@ -101,7 +103,9 @@ class LBRROS2ControlMixin:
             namespace=robot_name,
             remappings=[
                 ("~/robot_description", "robot_description"),
-                ('motion_control_handle/target_frame', 'cartesian_impedance_controller/target_frame'),
+                ("cartesian_impedance_controller/target_frame", "target_frame"),
+                ("cartesian_impedance_controller/target_wrench", "target_wrench"),
+                ("motion_control_handle/target_frame", "target_frame"),
             ],
             **kwargs,
         )
