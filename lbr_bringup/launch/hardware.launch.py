@@ -56,16 +56,6 @@ def generate_launch_description() -> LaunchDescription:
     lbr_state_broadcaster = LBRROS2ControlMixin.node_controller_spawner(
         controller="lbr_state_broadcaster"
     )
-    motion_control_handle = Node(
-            package="controller_manager",
-            executable="spawner",
-            output="screen",
-            arguments=["motion_control_handle", "--controller-manage", "controller_manager"],
-            namespace="lbr",
-        )
-    # lbr_motion_control_handle = LBRROS2ControlMixin.node_controller_spawner(
-    #     controller="motion_control_handle"
-    # )
     controller = LBRROS2ControlMixin.node_controller_spawner(
         controller=LaunchConfiguration("ctrl")
     )
@@ -81,6 +71,5 @@ def generate_launch_description() -> LaunchDescription:
             ],
         )
     )
-    # ld.add_action(motion_control_handle)
     ld.add_action(controller_event_handler)
     return ld

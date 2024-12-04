@@ -105,7 +105,6 @@ class LBRROS2ControlMixin:
                 ("~/robot_description", "robot_description"),
                 ("cartesian_impedance_controller/target_frame", "target_frame"),
                 ("cartesian_impedance_controller/target_wrench", "target_wrench"),
-                ("motion_control_handle/target_frame", "target_frame"),
             ],
             **kwargs,
         )

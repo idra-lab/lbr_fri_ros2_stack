@@ -38,8 +38,6 @@
     gravity_compensation:
       type: gravity_compensation/GravityCompensation
 
-    motion_control_handle:
-      type: cartesian_controller_handles/MotionControlHandle
 
 /**/force_torque_broadcaster:
   ros__parameters:
@@ -129,19 +127,6 @@
         rot_y: 180.0
         rot_z: 180.0
     kuka: true
-/**/motion_control_handle:
-  ros__parameters:
-    end_effector_link: "link_tool"
-    robot_base_link: "link_0"
-    ft_sensor_ref_link: "link_ee"
-    joints:
-      - A1
-      - A2
-      - A3
-      - A4
-      - A5
-      - A6
-      - A7
 
 /**/gravity_compensation:
   ros__parameters:
