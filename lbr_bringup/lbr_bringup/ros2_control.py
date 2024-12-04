@@ -37,11 +37,11 @@ class LBRROS2ControlMixin:
                 "lbr_torque_command_controller",
                 "lbr_wrench_command_controller",
                 "twist_controller",
-                "cartesian_impedance_controller",
-                "gravity_compensation"
+                "gravity_compensation",
+                "cartesian_impedance_controller"
             ],
         )
-    
+
     @staticmethod
     def arg_sys_cfg_pkg() -> DeclareLaunchArgument:
         return DeclareLaunchArgument(
@@ -68,7 +68,6 @@ class LBRROS2ControlMixin:
 
     @staticmethod
     def node_ros2_control(
-        robot_description: Dict[str, str],
         robot_name: Optional[Union[LaunchConfiguration, str]] = LaunchConfiguration(
             "robot_name", default="lbr"
         ),
@@ -84,8 +83,7 @@ class LBRROS2ControlMixin:
             package="controller_manager",
             executable="ros2_control_node",
             parameters=[
-                robot_description,
-                {"use_sim_time": False},
+                {"use_sim_time": use_sim_time},
                 PathJoinSubstitution(
                     [
                         FindPackageShare(
@@ -104,7 +102,7 @@ class LBRROS2ControlMixin:
             remappings=[
                 ("~/robot_description", "robot_description"),
                 ("cartesian_impedance_controller/target_frame", "target_frame"),
-                ("cartesian_impedance_controller/target_wrench", "target_wrench"),
+                ("cartesian_impedance_controller/target_wrench", "target_wrench")
             ],
             **kwargs,
         )
