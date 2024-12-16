@@ -80,6 +80,23 @@ void AsyncClient::waitForCommand() {
 }
 
 void AsyncClient::command() {
+  // if robot is in impedance or Cartesian impedance control mode, override open_loop_ to false
+  // also refer to https://github.com/lbr-stack/lbr_fri_ros2_stack/issues/226
+  auto control_mode = robotState().getControlMode();
+  if (control_mode == KUKA::FRI::EControlMode::JOINT_IMP_CONTROL_MODE ||
+      control_mode == KUKA::FRI::EControlMode::CART_IMP_CONTROL_MODE) {
+    if (open_loop_) {
+      RCLCPP_INFO_STREAM(rclcpp::get_logger(LOGGER_NAME),
+                         "Overriding open loop from '"
+                             << (open_loop_ ? "true" : "false")
+                             << "' to 'false' since LBR is in control mode '"
+                             << EnumMaps::control_mode_map(control_mode)
+                             << "'. Please refer to "
+                                "[https://github.com/lbr-stack/lbr_fri_ros2_stack/issues/226].");
+      open_loop_ = false;
+    }
+  }
+
   if (open_loop_) {
     state_interface_ptr_->set_state_open_loop(robotState(),
                                               command_interface_ptr_->get_command().joint_position);
