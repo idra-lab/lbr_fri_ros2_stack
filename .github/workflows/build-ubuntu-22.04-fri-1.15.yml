@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    uses: ./.github/workflows/build.yml
+    uses: ./.github/workflows/build-humble.yml
     with:
       os: ubuntu-22.04
       fri_version: 1.15
