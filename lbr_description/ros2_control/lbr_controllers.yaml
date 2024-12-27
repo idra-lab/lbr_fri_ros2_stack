@@ -77,8 +77,8 @@
 /**/cartesian_impedance_controller:
   ros__parameters:
     # when set as true the controller with forward the position commands to the
-    # robot together with the torque commands
-    kuka: true
+    # robot together with the torque commands (must be false when using gazebo)
+    kuka_hw: false
     # This is the tip of the robot tool that you usually use for your task.
     # For instance, it could be the drilling bit of a screwdriver or a grinding
     # tool.  When you specify a target_wrench, i.e. some additional forces that
@@ -148,5 +148,3 @@
       - lbr_A5
       - lbr_A6
       - lbr_A7
-    # flag used to enable position command together with effort command
-    kuka: true
