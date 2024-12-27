@@ -21,16 +21,23 @@
             <xacro:if value="${mode == 'hardware'}">
                 <hardware>
                     <plugin>lbr_ros2_control::SystemInterface</plugin>
-                    <param name="fri_client_sdk_major_version">${system_config['hardware']['fri_client_sdk']['major_version']}</param>
-                    <param name="fri_client_sdk_minor_version">${system_config['hardware']['fri_client_sdk']['minor_version']}</param>
-                    <param name="client_command_mode">${system_config['hardware']['client_command_mode']}</param>
+                    <param name="fri_client_sdk_major_version">
+                        ${system_config['hardware']['fri_client_sdk']['major_version']}</param>
+                    <param name="fri_client_sdk_minor_version">
+                        ${system_config['hardware']['fri_client_sdk']['minor_version']}</param>
+                    <param name="client_command_mode">
+                        ${system_config['hardware']['client_command_mode']}</param>
                     <param name="port_id">${system_config['hardware']['port_id']}</param>
                     <param name="remote_host">${system_config['hardware']['remote_host']}</param>
                     <param name="rt_prio">${system_config['hardware']['rt_prio']}</param>
-                    <param name="joint_position_tau">${system_config['hardware']['joint_position_tau']}</param>
-                    <param name="command_guard_variant">${system_config['hardware']['command_guard_variant']}</param>
-                    <param name="external_torque_tau">${system_config['hardware']['external_torque_tau']}</param>
-                    <param name="measured_torque_tau">${system_config['hardware']['measured_torque_tau']}</param>
+                    <param name="joint_position_tau">
+                        ${system_config['hardware']['joint_position_tau']}</param>
+                    <param name="command_guard_variant">
+                        ${system_config['hardware']['command_guard_variant']}</param>
+                    <param name="external_torque_tau">
+                        ${system_config['hardware']['external_torque_tau']}</param>
+                    <param name="measured_torque_tau">
+                        ${system_config['hardware']['measured_torque_tau']}</param>
                     <param name="open_loop">${system_config['hardware']['open_loop']}</param>
                 </hardware>
             </xacro:if>
@@ -94,18 +101,18 @@
             <xacro:macro name="joint_interface"
                 params="name min_position max_position max_velocity max_torque mode">
                 <joint name="${name}">
+                    <!-- only single command interface, refer
+                    https://github.com/ros-controls/gz_ros2_control/issues/182 -->
+                    <!-- <xacro:unless value="${mode == 'gazebo'}"> -->
                     <command_interface name="position">
                         <param name="min">${min_position}</param>
                         <param name="max">${max_position}</param>
                     </command_interface>
-                    <!-- only single command interface, refer
-                    https://github.com/ros-controls/gz_ros2_control/issues/182 -->
-                    <xacro:unless value="${mode == 'gazebo'}">
-                        <command_interface name="effort">
-                            <param name="min">-${max_torque}</param>
-                            <param name="max"> ${max_torque}</param>
-                        </command_interface>
-                    </xacro:unless>
+                    <command_interface name="effort">
+                        <param name="min">-${max_torque}</param>
+                        <param name="max"> ${max_torque}</param>
+                    </command_interface>
+                    <!-- </xacro:unless> -->
                     <state_interface name="position" />
                     <state_interface name="velocity" />
                     <state_interface name="effort" />

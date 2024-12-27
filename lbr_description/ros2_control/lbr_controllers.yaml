@@ -76,6 +76,8 @@
 
 /**/cartesian_impedance_controller:
   ros__parameters:
+    # when set as true the controller with forward the position commands to the
+    # robot together with the torque commands
     kuka: true
     # This is the tip of the robot tool that you usually use for your task.
     # For instance, it could be the drilling bit of a screwdriver or a grinding
@@ -126,6 +128,7 @@
         rot_x: 200.0
         rot_y: 200.0
         rot_z: 200.0
+    nullspace_stiffness: 0.0 # 10.0
     
 /**/gravity_compensation:
   ros__parameters:
