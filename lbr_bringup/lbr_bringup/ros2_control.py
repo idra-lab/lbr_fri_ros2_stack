@@ -38,7 +38,7 @@ class LBRROS2ControlMixin:
                 "lbr_wrench_command_controller",
                 "twist_controller",
                 "gravity_compensation",
-                "cartesian_impedance_controller"
+                "cartesian_impedance_controller",
             ],
         )
 
@@ -102,7 +102,7 @@ class LBRROS2ControlMixin:
             remappings=[
                 ("~/robot_description", "robot_description"),
                 ("cartesian_impedance_controller/target_frame", "target_frame"),
-                ("cartesian_impedance_controller/target_wrench", "target_wrench")
+                ("cartesian_impedance_controller/target_wrench", "target_wrench"),
             ],
             **kwargs,
         )
@@ -130,7 +130,7 @@ class LBRROS2ControlMixin:
             **kwargs,
         )
 
-    @staticmethod
+    # staticmethod
     def node_robot_state_publisher(
         robot_description: Dict[str, str],
         robot_name: Optional[LaunchConfiguration] = LaunchConfiguration(
