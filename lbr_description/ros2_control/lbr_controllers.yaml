@@ -122,13 +122,15 @@
       - lbr_A7
     delta_tau_max: 1.0 # Nm
     stiffness:  # w.r.t. compliance_ref_link coordinates
-        trans_x: 100.0
-        trans_y: 100.0
-        trans_z: 100.0
-        rot_x: 50.0
-        rot_y: 50.0
-        rot_z: 50.0
+        trans_x: 1000.0
+        trans_y: 1000.0
+        trans_z: 1000.0
+        rot_x: 200.0
+        rot_y: 200.0
+        rot_z: 200.0
     nullspace_stiffness: 0.0 # 10.0
+    compensate_gravity: false
+    compensate_coriolis: false
     
 /**/gravity_compensation:
   ros__parameters:
