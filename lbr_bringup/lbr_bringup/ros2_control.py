@@ -147,7 +147,10 @@ class LBRROS2ControlMixin:
             output="screen",
             parameters=[
                 robot_description,
-                {"use_sim_time": use_sim_time},
+                {
+                    "use_sim_time": use_sim_time,
+                    "publish_frequency": 1000.0,
+                },
             ],
             namespace=robot_name,
             **kwargs,
