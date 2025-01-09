@@ -39,6 +39,8 @@ class LBRROS2ControlMixin:
                 "twist_controller",
                 "gravity_compensation",
                 "cartesian_impedance_controller",
+                "cbf_cartesian_impedance_controller",
+                "motion_control_handle",
             ],
         )
 
