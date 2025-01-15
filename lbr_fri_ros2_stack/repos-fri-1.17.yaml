@@ -1,7 +1,7 @@
 repositories:
   fri:
     type: git
-    url: https://github.com/lbr-stack/fri
+    url: https://github.com/idra-lab/fri
     version: fri-1.17
   lbr_fri_idl:
     type: git
