@@ -13,6 +13,8 @@
                     <remapping>~/robot_description:=robot_description</remapping>
                     <remapping>cartesian_impedance_controller/target_frame:=target_frame</remapping>
                     <remapping>cartesian_impedance_controller/target_wrench:=target_wrench</remapping>
+                    <remapping>joint_impedance_controller/target_frame:=target_frame</remapping>
+                    <remapping>joint_impedance_controller/target_wrench:=target_wrench</remapping>
                 </ros>
             </plugin>
         </gazebo>
