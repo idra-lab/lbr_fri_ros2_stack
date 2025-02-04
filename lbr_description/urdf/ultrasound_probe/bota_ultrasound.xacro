@@ -1,0 +1,103 @@
+<?xml version="1.0"?>
+
+<!-- top level -->
+<robot name="iiwa14" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- include the lbr iiwa macro -->
+  <xacro:include filename="$(find lbr_description)/urdf/iiwa14/iiwa14_description.xacro" />
+
+  <xacro:arg name="robot_name" default="lbr" />
+  <xacro:arg name="mode" default="true" />
+  <!-- <xacro:arg name="use_ft_sensor" default="true" /> -->
+  <xacro:arg
+    name="system_config_path"
+    default="$(find lbr_description)/ros2_control/lbr_system_config.yaml" />
+
+  <!-- KDL requires a link without inertia -->
+  <link name="$(arg robot_name)_floating_link" />
+  <link name="world" />
+  <joint name="$world_to_base" type="fixed">
+    <parent link="world" />
+    <child link="$(arg robot_name)_floating_link" />
+  </joint>
+
+  <!--joint
+        between <robot_name>_floating_link and robot_name_link_0-->
+  <joint name="$(arg robot_name)_floating_joint" type="fixed">
+    <parent link="$(arg robot_name)_floating_link" />
+    <child link="$(arg robot_name)_link_0" />
+  </joint>
+
+  <!-- iiwa -->
+  <xacro:iiwa14
+    robot_name="$(arg robot_name)"
+    mode="$(arg mode)"
+    system_config_path="$(arg system_config_path)" />
+
+  <!-- force sensor urdf -->
+  <xacro:include filename="$(find rokubimini_description)/urdf/BFT_SENS_ECAT_M8.urdf.xacro" />
+
+  <!-- FT SENSOR-->
+
+  <xacro:BFT_SENS_ECAT_M8 prefix="ft_sensor0" />
+
+  <joint name="bota_ft_sensor" type="fixed">
+    <parent link="$(arg robot_name)_link_ee" />
+    <child link="ft_sensor0_mounting" />
+    <!-- <origin xyz="0.0 0.0 0.0" rpy="${pi} 0.0 ${pi/2}" /> -->
+    <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 ${pi}" />
+  </joint>
+
+
+  <!-- US probe model -->
+  <link
+    name="probe_mounting">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0.0 0.0 0.051" />
+      <mass value="3.0" />
+      <!-- <inertia ixx="0.0014625" ixy="0.0" ixz="0.0"
+        iyy="0.0014625" iyz="0.0"
+        izz="0.000225" /> -->
+      <inertia ixx="0.008775" ixy="0.0" ixz="0.0"
+        iyy="0.008775" iyz="0.0"
+        izz="0.00135" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://lbr_description/meshes/ultrasound_probe/probe.stl"
+          scale="0.001 0.001 0.001" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.2 0.2 0.2 1" />
+      </material>
+    </visual>
+  </link>
+
+  <joint name="tip_tool" type="fixed">
+    <parent link="ft_sensor0_wrench" />
+    <child link="probe_mounting" />
+    <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+  </joint>
+
+  <link
+    name="probe_bota">
+  </link>
+  <joint name="probe_joint" type="fixed">
+    <parent link="probe_mounting" />
+    <child link="probe_bota" />
+    <origin xyz="0.0 0.0 0.14" rpy="0.0 0.0 0.0" />
+  </joint>
+
+  <link
+    name="probe">
+  </link>
+  <joint name="ft_kuka_joint" type="fixed">
+    <parent link="probe_mounting" />
+    <child link="probe" />
+    <origin xyz="0.0 0.0 0.18" rpy="0.0 0.0 0.0" />
+  </joint>
+
+</robot>

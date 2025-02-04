@@ -15,68 +15,14 @@
     lbr_state_broadcaster:
       type: lbr_ros2_control/LBRStateBroadcaster
 
-    # ROS 2 control controllers
-    joint_trajectory_controller:
-      type: joint_trajectory_controller/JointTrajectoryController
-
-    forward_position_controller:
-      type: position_controllers/JointGroupPositionController
-
-    # LBR ROS 2 control controllers
-    lbr_joint_position_command_controller:
-      type: lbr_ros2_control/LBRJointPositionCommandController
-
-    lbr_torque_command_controller:
-      type: lbr_ros2_control/LBRTorqueCommandController
-
-    lbr_wrench_command_controller:
-      type: lbr_ros2_control/LBRWrenchCommandController
-
     cartesian_impedance_controller:
       type: cartesian_impedance_controller/CartesianImpedanceController
-    
-    joint_impedance_controller:
-      type: joint_impedance_controller/JointImpedanceController
-
-    gravity_compensation:
-      type: gravity_compensation/GravityCompensation
-
 
 /**/force_torque_broadcaster:
   ros__parameters:
     frame_id: lbr/lbr_link_ee
     sensor_name: estimated_ft_sensor
-
-/**/joint_trajectory_controller:
-  ros__parameters:
-    joints:
-      - lbr_A1
-      - lbr_A2
-      - lbr_A3
-      - lbr_A4
-      - lbr_A5
-      - lbr_A6
-      - lbr_A7
-    command_interfaces:
-      - position
-    state_interfaces:
-      - position
-      - velocity
-    state_publish_rate: 50.0
-    action_monitor_rate: 20.0
-
-/**/forward_position_controller:
-  ros__parameters:
-    joints:
-      - lbr_A1
-      - lbr_A2
-      - lbr_A3
-      - lbr_A4
-      - lbr_A5
-      - lbr_A6
-      - lbr_A7
-    interface_name: position
-
+    
 /**/cartesian_impedance_controller:
   ros__parameters:
     # when set as true the controller with forward the position commands to the
@@ -87,7 +33,7 @@
     # tool.  When you specify a target_wrench, i.e. some additional forces that
     # your robot should apply to its environment, that target_wrench gets
     # applied in this frame.
-    end_effector_link: "lbr_link_ee"
+    end_effector_link: "probe"
 
     # This is usually the link directly before the first actuated joint.  All
     # controllers will build a kinematic chain from this link up to
@@ -99,7 +45,7 @@
     # given in this frame.  It's important that this link is located somewhere
     # between end_effector_link and robot_base_link.  If that's not the case,
     # the controllers won't initialize and will emit an error message.
-    ft_sensor_ref_link: "lbr_link_ee"
+    ft_sensor_ref_link: "probe"
 
     # This is the link that the robot feels compliant about. It does not need
     # to coincide with the end_effector_link, but for many use cases, this
@@ -108,7 +54,7 @@
     # downward pushing forces without generating unwanted offset moments.
     # On the other hand, an application could benefit from yielding a little in
     # the robot's wrist while drawing a line on a surface with a pen.
-    compliance_ref_link: "lbr_link_ee"
+    compliance_ref_link: "probe"
 
     command_interfaces:
       - effort
@@ -135,56 +81,3 @@
     nullspace_stiffness: 10.0 # 10.0
     compensate_gravity: false
     compensate_coriolis: true
-
-/**/joint_impedance_controller:
-  ros__parameters:
-    kuka_hw: true
-    end_effector_link: "lbr_link_ee"
-    robot_base_link: "lbr_link_0"
-    ft_sensor_ref_link: "lbr_link_ee"
-    compliance_ref_link: "lbr_link_ee"
-
-    command_interfaces:
-      - effort
-    state_interfaces:
-      - position
-      - velocity
-    joints:
-      - lbr_A1
-      - lbr_A2
-      - lbr_A3
-      - lbr_A4
-      - lbr_A5
-      - lbr_A6
-      - lbr_A7
-    stiffness:
-      joint1: 200.0
-      joint2: 200.0
-      joint3: 200.0
-      joint4: 200.0
-      joint5: 100.0
-      joint6: 100.0
-      joint7: 100.0
-    nullspace_stiffness: 0.0 # 10.0
-    compensate_gravity: false
-    compensate_coriolis: false
-
-    
-/**/gravity_compensation:
-  ros__parameters:
-    end_effector_link: "lbr_link_ee"
-    robot_base_link: "lbr_link_0"
-    ft_sensor_ref_link: "lbr_link_ee"
-    command_interfaces:
-      - effort
-    state_interfaces:
-      - position
-      - velocity
-    joints:
-      - lbr_A1
-      - lbr_A2
-      - lbr_A3
-      - lbr_A4
-      - lbr_A5
-      - lbr_A6
-      - lbr_A7

@@ -60,6 +60,59 @@ class LBRDescriptionMixin:
             )
         }
         return robot_description
+    
+    @staticmethod
+    def param_robot_description_ultrasound(
+        # model is iiwa14
+        path: Optional[Union[LaunchConfiguration, str]] = LaunchConfiguration(
+            "path", default="urdf/ultrasound_probe/bota_ultrasound"
+        ),
+        robot_name: Optional[Union[LaunchConfiguration, str]] = LaunchConfiguration(
+            "robot_name", default="lbr"
+        ),
+        mode: Optional[Union[LaunchConfiguration, bool]] = LaunchConfiguration(
+            "mode", default="mock"
+        ),
+        system_config_path: Optional[
+            Union[LaunchConfiguration, str]
+        ] = PathJoinSubstitution(
+            [
+                FindPackageShare(
+                    LaunchConfiguration("sys_cfg_pkg", default="lbr_description")
+                ),
+                LaunchConfiguration(
+                    "sys_cfg", default="ros2_control/lbr_system_config.yaml"
+                ),
+            ]
+        ),
+    ) -> Dict[str, str]:
+        robot_description = {
+            "robot_description": Command(
+                [
+                    FindExecutable(name="xacro"),
+                    " ",
+                    PathJoinSubstitution(
+                        [
+                            FindPackageShare("lbr_description"),
+                            # path
+                            path,
+                        ]
+                    ),
+                    ".xacro",
+                    " robot_name:=",
+                    robot_name,
+                    " mode:=",
+                    mode,
+                    " system_config_path:=",
+                    system_config_path,
+                ]
+            )
+        }
+        return robot_description
+
+
+
+
 
     @staticmethod
     def arg_model(default_value: str = "iiwa7") -> DeclareLaunchArgument:

@@ -1,0 +1,155 @@
+<?xml version="1.0"?>
+
+<!-- top level -->
+<robot name="iiwa14" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <!-- include the lbr iiwa macro -->
+    <xacro:include filename="$(find lbr_description)/urdf/iiwa14/iiwa14_description.xacro" />
+
+    <xacro:arg name="robot_name" default="lbr" />
+    <xacro:arg name="mode" default="true" />
+    <!-- <xacro:arg name="use_ft_sensor" default="true" /> -->
+    <xacro:arg
+        name="system_config_path"
+        default="$(find lbr_description)/ros2_control/lbr_system_config.yaml" />
+
+    <!-- KDL requires a link without inertia -->
+    <link name="$(arg robot_name)_floating_link" />
+    <link name="world" />
+    <joint name="$world_to_base" type="fixed">
+        <parent link="world" />
+        <child link="$(arg robot_name)_floating_link" />
+    </joint>
+
+    <!--joint
+        between <robot_name>_floating_link and robot_name_link_0-->
+    <joint name="$(arg robot_name)_floating_joint" type="fixed">
+        <parent link="$(arg robot_name)_floating_link" />
+        <child link="$(arg robot_name)_link_0" />
+    </joint>
+
+    <!-- iiwa -->
+    <xacro:iiwa14
+        robot_name="$(arg robot_name)"
+        mode="$(arg mode)"
+        system_config_path="$(arg system_config_path)" />
+
+  <!-- force sensor urdf -->
+  <xacro:include filename="$(find rokubimini_description)/urdf/BFT_SENS_ECAT_M8.urdf.xacro" />
+
+  <!-- FT SENSOR-->
+  
+  <xacro:BFT_SENS_ECAT_M8 prefix="ft_sensor0" />
+
+  <joint name="bota_ft_sensor" type="fixed">
+    <parent link="$(arg robot_name)_link_ee" />
+    <child link="ft_sensor0_mounting" />
+    <!-- <origin xyz="0.0 0.0 0.0" rpy="${pi} 0.0 ${pi/2}" /> -->
+    <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 ${pi}" />
+  </joint>
+
+  <!-- CAMERA ATTACHMENT-->
+  <link
+    name="camera_support">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 ${pi}" />
+      <geometry>
+        <mesh filename="package://lbr_description/meshes/ultrasound_probe/camera_support.stl"
+          scale="0.001 0.001 0.001" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.6902 0.61176 0.52941 1" />
+      </material>
+    </visual>
+  </link>
+
+  <joint name="camera_support_joint1" type="fixed">
+    <parent link="ft_sensor0_wrench" />
+    <child link="camera_support" />
+    <origin xyz="0.00 0.00 0.00" rpy="-${pi/2} ${pi} ${pi/4}" />
+  </joint>
+  <!-- ZED -->
+  <!--
+    Parameters:
+      - name: the camera's name.  should match the parameter sent to the launch file for this camera
+      - model: the type of camera, one of zed, zedm, zed2, zed2i, zedx, zedxm, virtual
+      - enable_gnss: if true enable the URDF link
+  -->
+  <xacro:arg name="camera_name" default="zed2" />
+  <xacro:arg name="camera_model" default="zed2" />
+  <xacro:arg name="custom_baseline" default="0.0" />
+
+  <joint name="camera_support_joint2" type="fixed">
+    <parent link="camera_support" />
+    <child link="zed2_camera_link" />
+    <origin xyz="-0.081653 0.018797 0.0" rpy="-${pi/2} 0.0 ${pi/2}" />
+  </joint>
+  <!-- <joint name="camera_support_joint2" type="fixed">
+    <parent link="camera_support" />
+    <child link="zed2_camera_link" />
+    <origin xyz="-0.081653 0.045 0.0" rpy="-${pi/2} 0.0 ${pi/2}" />
+  </joint> -->
+  
+  <!-- If GNSS fusion is enabled the position of the antenna with respect to the camera mount point
+  is required -->
+  <xacro:arg name="enable_gnss" default="false" />
+  <xacro:arg name="gnss_x" default="0.0" />
+  <xacro:arg name="gnss_y" default="0.0" />
+  <xacro:arg name="gnss_z" default="0.0" />
+
+  <xacro:include filename="$(find zed_wrapper)/urdf/zed_macro.urdf.xacro" />
+  <xacro:zed_camera name="$(arg camera_name)" model="$(arg camera_model)"
+    custom_baseline="$(arg custom_baseline)" enable_gnss="$(arg enable_gnss)">
+    <origin xyz="$(arg gnss_x) $(arg gnss_y) $(arg gnss_z)" rpy="0 0 0" />
+  </xacro:zed_camera>
+
+  <!-- US probe model -->
+  <link
+  name="probe_mounting">
+  <inertial>
+    <origin rpy="0 0 0" xyz="0.0204 0.0212 0.0492" />
+    <mass value="0.5" />
+    <inertia ixx="0.044604" ixy="0.0" ixz="-0.000788" iyy="0.045465" iyz="0.0"
+        izz="0.061904" />
+</inertial>
+  <visual>
+    <origin xyz="0 0 0" rpy="0 0 0" />
+    <geometry>
+      <mesh filename="package://lbr_description/meshes/ultrasound_probe/probe.stl"
+        scale="0.001 0.001 0.001" />
+    </geometry>
+    <material
+      name="">
+      <color
+        rgba="0.2 0.2 0.2 1" />
+    </material>
+  </visual>
+  </link>
+
+  <joint name="tip_tool" type="fixed">
+    <parent link="ft_sensor0_wrench" />
+    <child link="probe_mounting" />
+    <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+  </joint>
+
+  <link
+  name="probe_bota">
+  </link>
+  <joint name="probe_joint" type="fixed">
+    <parent link="probe_mounting" />
+    <child link="probe_bota" />
+    <origin xyz="0.0 0.0 0.14" rpy="0.0 0.0 0.0" />
+  </joint>
+
+  <link
+  name="probe">
+  </link>
+  <joint name="ft_kuka_joint" type="fixed">
+    <parent link="$(arg robot_name)_link_ee" />
+    <child link="probe" />
+    <origin xyz="0.0 0.0 0.21" rpy="0.0 0.0 0.0" />
+  </joint>
+
+</robot>
