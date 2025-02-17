@@ -35,18 +35,17 @@
         system_config_path="$(arg system_config_path)" />
 
   <!-- force sensor urdf -->
-  <xacro:include filename="$(find rokubimini_description)/urdf/BFT_SENS_ECAT_M8.urdf.xacro" />
+  <!-- <xacro:include filename="$(find rokubimini_description)/urdf/BFT_SENS_ECAT_M8.urdf.xacro" /> -->
 
   <!-- FT SENSOR-->
   
-  <xacro:BFT_SENS_ECAT_M8 prefix="ft_sensor0" />
+  <!-- <xacro:BFT_SENS_ECAT_M8 prefix="ft_sensor0" />
 
   <joint name="bota_ft_sensor" type="fixed">
     <parent link="$(arg robot_name)_link_ee" />
     <child link="ft_sensor0_mounting" />
-    <!-- <origin xyz="0.0 0.0 0.0" rpy="${pi} 0.0 ${pi/2}" /> -->
     <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 ${pi}" />
-  </joint>
+  </joint> -->
 
   <!-- CAMERA ATTACHMENT-->
   <link
@@ -66,9 +65,9 @@
   </link>
 
   <joint name="camera_support_joint1" type="fixed">
-    <parent link="ft_sensor0_wrench" />
+    <parent link="$(arg robot_name)_link_ee" />
     <child link="camera_support" />
-    <origin xyz="0.00 0.00 0.00" rpy="-${pi/2} ${pi} ${pi/4}" />
+    <origin xyz="0.00 0.00 0.005" rpy="-${pi/2} ${pi} ${1*pi/4}" />
   </joint>
   <!-- ZED -->
   <!--
@@ -105,6 +104,12 @@
     <origin xyz="$(arg gnss_x) $(arg gnss_y) $(arg gnss_z)" rpy="0 0 0" />
   </xacro:zed_camera>
 
+  <joint name="camera_to_probe" type="fixed">
+    <parent link="camera_support" />
+    <child link="probe_mounting" />
+    <origin xyz="0 0 0" rpy="-${pi/2} ${-pi/4} 0.0" />
+  </joint>
+
   <!-- US probe model -->
   <link
   name="probe_mounting">
@@ -128,28 +133,22 @@
   </visual>
   </link>
 
-  <joint name="tip_tool" type="fixed">
-    <parent link="ft_sensor0_wrench" />
-    <child link="probe_mounting" />
-    <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
-  </joint>
-
-  <link
+  <!-- <link
   name="probe_bota">
   </link>
   <joint name="probe_joint" type="fixed">
     <parent link="probe_mounting" />
     <child link="probe_bota" />
     <origin xyz="0.0 0.0 0.14" rpy="0.0 0.0 0.0" />
-  </joint>
+  </joint> -->
 
   <link
   name="probe">
   </link>
-  <joint name="ft_kuka_joint" type="fixed">
+  <joint name="probe_transl_joint" type="fixed">
     <parent link="$(arg robot_name)_link_ee" />
     <child link="probe" />
-    <origin xyz="0.0 0.0 0.21" rpy="0.0 0.0 0.0" />
+    <origin xyz="0.0 0.0 0.16" rpy="0.0 0.0 -${pi/4}" />
   </joint>
 
 </robot>

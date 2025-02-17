@@ -65,7 +65,7 @@ class LBRDescriptionMixin:
     def param_robot_description_ultrasound(
         # model is iiwa14
         path: Optional[Union[LaunchConfiguration, str]] = LaunchConfiguration(
-            "path", default="urdf/ultrasound_probe/bota_ultrasound"
+            "path", default="urdf/ultrasound_probe/bota_camera_ultrasound"
         ),
         robot_name: Optional[Union[LaunchConfiguration, str]] = LaunchConfiguration(
             "robot_name", default="lbr"

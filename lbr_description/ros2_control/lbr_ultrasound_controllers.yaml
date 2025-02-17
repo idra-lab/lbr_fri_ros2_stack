@@ -18,6 +18,24 @@
     cartesian_impedance_controller:
       type: cartesian_impedance_controller/CartesianImpedanceController
 
+
+    motion_control_handle:
+      type: cartesian_controller_handles/MotionControlHandle
+
+
+/**/motion_control_handle:
+  ros__parameters:
+    end_effector_link: "probe"
+    robot_base_link: "lbr_link_0"
+    joints:
+      - lbr_A1
+      - lbr_A2
+      - lbr_A3
+      - lbr_A4
+      - lbr_A5
+      - lbr_A6
+      - lbr_A7
+
 /**/force_torque_broadcaster:
   ros__parameters:
     frame_id: lbr/lbr_link_ee
@@ -72,12 +90,12 @@
     max_impedance_force: 10000.0 # N
     delta_tau_max: 1.0 # Nm
     stiffness:  # w.r.t. compliance_ref_link coordinates
-        trans_x: 600.0
-        trans_y: 600.0
-        trans_z: 600.0
+        trans_x: 800.0
+        trans_y: 800.0
+        trans_z: 800.0
         rot_x: 20.0
         rot_y: 20.0
         rot_z: 20.0
-    nullspace_stiffness: 10.0 # 10.0
+    nullspace_stiffness: 30.0 # 10.0
     compensate_gravity: false
-    compensate_coriolis: true
+    compensate_coriolis: false

@@ -654,6 +654,10 @@ bool SystemInterface::exit_commanding_active_(
     const KUKA::FRI::ESessionState &session_state) {
   if (previous_session_state == KUKA::FRI::ESessionState::COMMANDING_ACTIVE &&
       previous_session_state != session_state) {
+        RCLCPP_ERROR_STREAM(rclcpp::get_logger(LOGGER_NAME),
+                            lbr_fri_ros2::ColorScheme::ERROR
+                                << "Exit Condition: LBR left COMMANDING_ACTIVE"
+                                << lbr_fri_ros2::ColorScheme::ENDC);
     return true;
   }
   return false;

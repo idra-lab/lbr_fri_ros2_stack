@@ -40,6 +40,7 @@ class LBRROS2ControlMixin:
                 "gravity_compensation",
                 "cartesian_impedance_controller",
                 "joint_impedance_controller",
+                "motion_control_handle"
             ],
         )
 
@@ -102,6 +103,7 @@ class LBRROS2ControlMixin:
             namespace=robot_name,
             remappings=[
                 ("~/robot_description", "robot_description"),
+                ("motion_control_handle/target_frame", "target_frame"),
                 ("cartesian_impedance_controller/target_frame", "target_frame"),
                 ("cartesian_impedance_controller/target_wrench", "target_wrench"),
                 ("joint_impedance_controller/target_frame", "target_frame"),
