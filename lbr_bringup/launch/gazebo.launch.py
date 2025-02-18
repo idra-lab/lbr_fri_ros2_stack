@@ -28,7 +28,7 @@ def generate_launch_description() -> LaunchDescription:
     )
 
     # robot description
-    robot_description = LBRDescriptionMixin.param_robot_description(mode="gazebo")
+    robot_description = LBRDescriptionMixin.param_robot_description_ultrasound(mode="gazebo")
 
     # robot state publisher
     robot_state_publisher = LBRROS2ControlMixin.node_robot_state_publisher(

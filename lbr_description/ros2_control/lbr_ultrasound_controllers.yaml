@@ -2,7 +2,7 @@
 # managers regardless of their namespace. Usefull in multi-robot setups.
 /**/controller_manager:
   ros__parameters:
-    update_rate: 1000
+    update_rate: 500
 
     # ROS 2 control broadcasters
     joint_state_broadcaster:
@@ -96,6 +96,6 @@
         rot_x: 20.0
         rot_y: 20.0
         rot_z: 20.0
-    nullspace_stiffness: 30.0 # 10.0
+    nullspace_stiffness: 0.0 # 10.0
     compensate_gravity: false
     compensate_coriolis: false

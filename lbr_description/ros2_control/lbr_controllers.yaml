@@ -126,15 +126,15 @@
     max_impedance_force: 10000.0 # N
     delta_tau_max: 1.0 # Nm
     stiffness:  # w.r.t. compliance_ref_link coordinates
-        trans_x: 600.0
-        trans_y: 600.0
-        trans_z: 600.0
+        trans_x: 800.0
+        trans_y: 800.0
+        trans_z: 800.0
         rot_x: 20.0
         rot_y: 20.0
         rot_z: 20.0
-    nullspace_stiffness: 10.0 # 10.0
+    nullspace_stiffness: 0.0 # 10.0
     compensate_gravity: false
-    compensate_coriolis: true
+    compensate_coriolis: false
 
 /**/joint_impedance_controller:
   ros__parameters:
