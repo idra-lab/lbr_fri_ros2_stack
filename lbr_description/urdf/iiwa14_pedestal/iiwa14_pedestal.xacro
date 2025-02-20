@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+
+<!-- top level -->
+<robot name="iiwa14_pedestal" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <!-- include the lbr iiwa macro -->
+    <xacro:include filename="$(find lbr_description)/urdf/iiwa14/iiwa14_description.xacro" />
+    <!-- include the pedestal macro -->
+    <xacro:include filename="$(find pedestals_description)/urdf/kuka_pedestal_description.xacro" />
+
+    <xacro:arg name="robot_name" default="lbr" />
+    <xacro:arg name="mode" default="true" />
+    <xacro:arg
+        name="system_config_path"
+        default="$(find lbr_description)/ros2_control/lbr_system_config.yaml" />
+
+    <!-- KDL requires a link without inertia -->
+    <link name="$(arg robot_name)_floating_link" />
+    <link name="world" />
+    <joint name="$world_to_base" type="fixed">
+        <parent link="world" />
+        <child link="$(arg robot_name)_floating_link" />
+    </joint>
+
+    <!--joint between <robot_name>_floating_link and robot_name_link_0-->
+    <joint name="$(arg robot_name)_floating_joint" type="fixed">
+        <parent link="$(arg robot_name)_floating_link" />
+        <child link="$(arg robot_name)_link_0" />
+    </joint>
+
+    <!-- Fixed joint connecting the base and top frames -->
+    <joint name="pedestal_top_to_world" type="fixed">
+        <parent link="pedestal_top_frame"/>
+        <child link="world"/>
+    </joint>
+
+    <!-- pedestal -->
+    <xacro:kuka_pedestal />
+
+    <!-- iiwa -->
+    <xacro:iiwa14
+        robot_name="$(arg robot_name)"
+        mode="$(arg mode)"
+        system_config_path="$(arg system_config_path)" />
+</robot>
