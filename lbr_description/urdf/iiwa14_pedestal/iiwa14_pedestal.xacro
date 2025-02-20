@@ -16,9 +16,9 @@
 
     <!-- KDL requires a link without inertia -->
     <link name="$(arg robot_name)_floating_link" />
-    <link name="world" />
-    <joint name="$world_to_base" type="fixed">
-        <parent link="world" />
+    <!-- <link name="world" /> -->
+    <joint name="$pedestal_top_to_base" type="fixed">
+        <parent link="pedestal_top_frame" />
         <child link="$(arg robot_name)_floating_link" />
     </joint>
 
@@ -29,9 +29,14 @@
     </joint>
 
     <!-- Fixed joint connecting the base and top frames -->
-    <joint name="pedestal_top_to_world" type="fixed">
-        <parent link="pedestal_top_frame"/>
+    <!-- <joint name="pedestal_base_to_world" type="fixed">
+        <parent link="pedestal_base_frame"/>
         <child link="world"/>
+    </joint> -->
+    <link name="world" />
+    <joint name="world_to_pedestal_base" type="fixed">
+        <parent link="world"/>
+        <child link="pedestal_base_frame"/>
     </joint>
 
     <!-- pedestal -->
