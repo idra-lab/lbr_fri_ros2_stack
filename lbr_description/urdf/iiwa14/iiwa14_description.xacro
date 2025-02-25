@@ -272,7 +272,7 @@
             <inertial>
                 <origin rpy="0 0 0" xyz="-0.0029 8.1e-04 0.1998" />
                 <mass value="3.5296" />
-                <inertia ixx="0.0081" ixy="-9.1e-06" ixz="-9.9e-06" iyy="1.0e-04" iyz="-9.9e-06"
+                <inertia ixx="0.0081" ixy="-9.1e-06" ixz="-9.9e-06" iyy="1.2e-04" iyz="-9.9e-06"
                     izz="0.0080" />
                 <!-- iyy is 1.0e.05 in the paper but it seems to cause invalid inertia error -->
             </inertial>

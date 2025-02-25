@@ -40,7 +40,9 @@ class LBRROS2ControlMixin:
                 "gravity_compensation",
                 "cartesian_impedance_controller",
                 "joint_impedance_controller",
-                "motion_control_handle"
+                "motion_control_handle",
+                "cbf_cartesian_impedance_controller",
+                "hocbf_cartesian_impedance_controller",
             ],
         )
 

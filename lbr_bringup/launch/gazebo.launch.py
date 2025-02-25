@@ -3,7 +3,7 @@ from launch.substitutions import LaunchConfiguration, PythonExpression
 from lbr_bringup.description import LBRDescriptionMixin
 from lbr_bringup.gazebo import GazeboMixin
 from lbr_bringup.ros2_control import LBRROS2ControlMixin
-
+from launch_ros.actions import Node
 
 def generate_launch_description() -> LaunchDescription:
     ld = LaunchDescription()
@@ -26,7 +26,12 @@ def generate_launch_description() -> LaunchDescription:
             ),
         )
     )
-
+    rviz_node = Node(
+        package="rviz2",
+        executable="rviz2",
+        output="screen",
+    )
+    ld.add_action(rviz_node)
     # robot description
     robot_description = LBRDescriptionMixin.param_robot_description_ultrasound(mode="gazebo")
 

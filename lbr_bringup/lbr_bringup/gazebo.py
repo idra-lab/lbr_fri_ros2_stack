@@ -20,7 +20,7 @@ class GazeboMixin:
                     ]
                 ),
             ),
-            launch_arguments={"gz_args": "-r empty.sdf"}.items(),
+            launch_arguments={"gz_args": "-r -s empty.sdf"}.items(),
             **kwargs,
         )
 
