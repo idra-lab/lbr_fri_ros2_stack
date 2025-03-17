@@ -17,6 +17,8 @@
                     <remapping>cbf_cartesian_impedance_controller/target_wrench:=target_wrench</remapping>
                     <remapping>hocbf_cartesian_impedance_controller/target_frame:=target_frame</remapping>
                     <remapping>hocbf_cartesian_impedance_controller/target_wrench:=target_wrench</remapping>
+                    <remapping>kuka_cartesian_impedance_controller/target_frame:=target_frame</remapping>
+                    <remapping>kuka_cartesian_impedance_controller/target_wrench:=target_wrench</remapping>                    
                     <remapping>joint_impedance_controller/target_frame:=target_frame</remapping>
                     <remapping>joint_impedance_controller/target_wrench:=target_wrench</remapping>
                 </ros>

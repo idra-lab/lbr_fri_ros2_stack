@@ -42,6 +42,7 @@ class LBRROS2ControlMixin:
                 "joint_impedance_controller",
                 "motion_control_handle",
                 "cbf_cartesian_impedance_controller",
+                "kuka_cartesian_impedance_controller",
                 "hocbf_cartesian_impedance_controller",
             ],
         )
@@ -110,6 +111,7 @@ class LBRROS2ControlMixin:
                 ("cartesian_impedance_controller/target_wrench", "target_wrench"),
                 ("joint_impedance_controller/target_frame", "target_frame"),
                 ("joint_impedance_controller/target_wrench", "target_wrench"),
+                ("kuka_cartesian_impedance_controller/target_frame", "target_frame"),
             ],
             **kwargs,
         )

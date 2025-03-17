@@ -2,7 +2,7 @@
 # managers regardless of their namespace. Usefull in multi-robot setups.
 /**/controller_manager:
   ros__parameters:
-    update_rate: 500
+    update_rate: 1000
 
     # ROS 2 control broadcasters
     joint_state_broadcaster:
@@ -40,6 +40,10 @@
 
     gravity_compensation:
       type: gravity_compensation/GravityCompensation
+    
+    kuka_cartesian_impedance_controller:
+      type: kuka_cartesian_impedance_controller/KukaCartesianImpedanceController
+
     
     cbf_cartesian_impedance_controller:
       type: cbf_cartesian_impedance_controller/CBFCartesianImpedanceController
@@ -93,7 +97,7 @@
     # tool.  When you specify a target_wrench, i.e. some additional forces that
     # your robot should apply to its environment, that target_wrench gets
     # applied in this frame.
-    end_effector_link: "probe"
+    end_effector_link: "lbr_link_ee"
 
     # This is usually the link directly before the first actuated joint.  All
     # controllers will build a kinematic chain from this link up to
@@ -105,7 +109,7 @@
     # given in this frame.  It's important that this link is located somewhere
     # between end_effector_link and robot_base_link.  If that's not the case,
     # the controllers won't initialize and will emit an error message.
-    ft_sensor_ref_link: "probe"
+    ft_sensor_ref_link: "lbr_link_ee"
 
     # This is the link that the robot feels compliant about. It does not need
     # to coincide with the end_effector_link, but for many use cases, this
@@ -271,4 +275,25 @@
     compensate_coriolis: true
     alpha_1: 100.0
     alpha_2: 100.0
+
+
+/**/kuka_cartesian_impedance_controller:
+  ros__parameters:
+    kuka_hw: false
+    end_effector_link: "lbr_link_ee"
+    robot_base_link: "lbr_link_0"
+    compliance_ref_link: "lbr_link_ee"
+    command_interfaces:
+      - effort
+    state_interfaces:
+      - position
+      - velocity
+    joints:
+      - lbr_A1
+      - lbr_A2
+      - lbr_A3
+      - lbr_A4
+      - lbr_A5
+      - lbr_A6
+      - lbr_A7
 
