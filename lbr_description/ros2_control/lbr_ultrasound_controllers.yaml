@@ -2,7 +2,7 @@
 # managers regardless of their namespace. Usefull in multi-robot setups.
 /**/controller_manager:
   ros__parameters:
-    update_rate: 500
+    update_rate: 1000
 
     # ROS 2 control broadcasters
     joint_state_broadcaster:
@@ -106,7 +106,7 @@
 
 /**/kuka_cartesian_impedance_controller:
   ros__parameters:
-    max_linear_velocity: 0.02
+    max_linear_velocity: 0.1
     max_angular_velocity: 0.1
     kuka_hw: false
     end_effector_link: "probe"

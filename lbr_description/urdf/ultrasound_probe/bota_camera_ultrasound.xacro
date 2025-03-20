@@ -148,7 +148,7 @@
   <joint name="probe_transl_joint" type="fixed">
     <parent link="$(arg robot_name)_link_ee" />
     <child link="probe" />
-    <origin xyz="0.0 0.0 0.17" rpy="0.0 0.0 -${pi/4}" />
+    <origin xyz="0.0 0.0 0.175" rpy="0.0 0.0 -${pi/4}" />
   </joint>
 
 </robot>

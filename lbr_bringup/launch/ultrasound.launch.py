@@ -38,7 +38,7 @@ def generate_launch_description() -> LaunchDescription:
     # robot_description = LBRDescriptionMixin.param_robot_description(mode="hardware")
     robot_description = LBRDescriptionMixin.param_robot_description_ultrasound(mode="hardware")
 
-    # robot state publisher
+    # robot state publisher with rate
     robot_state_publisher = LBRROS2ControlMixin.node_robot_state_publisher(
         robot_description=robot_description, use_sim_time=False
     )
