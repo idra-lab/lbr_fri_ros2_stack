@@ -1,35 +1,35 @@
 A1:
-  lower: -170
-  upper: 170
+  lower: -169.5
+  upper: 169.5
   velocity: 85
   effort: 200
 A2:
-  lower: -120
-  upper: 120
+  lower: -119.5
+  upper: 119.5
   velocity: 85
   effort: 200
 A3:
-  lower: -170
-  upper: 170
+  lower: -169.5
+  upper: 169.5
   velocity: 100
   effort: 200
 A4:
-  lower: -120
-  upper: 120
+  lower: -119.5
+  upper: 119.5
   velocity: 75
   effort: 200
 A5:
-  lower: -170
-  upper: 170
+  lower: -169.5
+  upper: 169.5
   velocity: 130
   effort: 200
 A6:
-  lower: -120
-  upper: 120
+  lower: -119.7
+  upper: 119.7
   velocity: 135
   effort: 200
 A7:
-  lower: -175
-  upper: 175
+  lower: -174.5
+  upper: 174.5
   velocity: 135
   effort: 200

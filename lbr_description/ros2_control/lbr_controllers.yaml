@@ -51,6 +51,22 @@
     hocbf_cartesian_impedance_controller:
       type: hocbf_cartesian_impedance_controller/HOCBFCartesianImpedanceController
 
+    motion_control_handle:
+      type: cartesian_controller_handles/MotionControlHandle
+
+
+/**/motion_control_handle:
+  ros__parameters:
+    end_effector_link: "lbr_link_ee"
+    robot_base_link: "lbr_link_0"
+    joints:
+      - lbr_A1
+      - lbr_A2
+      - lbr_A3
+      - lbr_A4
+      - lbr_A5
+      - lbr_A6
+      - lbr_A7
 
 /**/force_torque_broadcaster:
   ros__parameters:
@@ -279,6 +295,8 @@
 
 /**/kuka_cartesian_impedance_controller:
   ros__parameters:
+    max_linear_velocity: 0.3
+    max_angular_velocity: 0.3
     kuka_hw: false
     end_effector_link: "lbr_link_ee"
     robot_base_link: "lbr_link_0"

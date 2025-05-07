@@ -106,8 +106,8 @@
 
 /**/kuka_cartesian_impedance_controller:
   ros__parameters:
-    max_linear_velocity: 0.1
-    max_angular_velocity: 0.1
+    max_linear_velocity: 0.08
+    max_angular_velocity: 0.2
     kuka_hw: false
     end_effector_link: "probe"
     robot_base_link: "lbr_link_0"
@@ -125,3 +125,4 @@
       - lbr_A5
       - lbr_A6
       - lbr_A7
+

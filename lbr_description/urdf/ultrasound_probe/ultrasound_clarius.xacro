@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+
+<!-- top level -->
+<robot name="iiwa14" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <material name="transparent">
+    <color rgba="1 0 0 1.0" />
+  </material>
+  <!-- include the lbr iiwa macro -->
+  <xacro:include filename="$(find lbr_description)/urdf/iiwa14/iiwa14_description.xacro" />
+
+  <xacro:arg name="robot_name" default="lbr" />
+  <xacro:arg name="mode" default="true" />
+  <!-- <xacro:arg name="use_ft_sensor" default="true" /> -->
+  <xacro:arg
+    name="system_config_path"
+    default="$(find lbr_description)/ros2_control/lbr_system_config.yaml" />
+
+  <!-- KDL requires a link without inertia -->
+  <link name="$(arg robot_name)_floating_link" />
+  <link name="world" />
+  <joint name="$world_to_base" type="fixed">
+    <parent link="world" />
+    <child link="$(arg robot_name)_floating_link" />
+  </joint>
+
+  <!--joint
+        between <robot_name>_floating_link and robot_name_link_0-->
+  <joint name="$(arg robot_name)_floating_joint" type="fixed">
+    <parent link="$(arg robot_name)_floating_link" />
+    <child link="$(arg robot_name)_link_0" />
+  </joint>
+
+  <!-- iiwa -->
+  <xacro:iiwa14
+    robot_name="$(arg robot_name)"
+    mode="$(arg mode)"
+    system_config_path="$(arg system_config_path)" />
+  <joint name="probe_joint" type="fixed">
+    <parent link="$(arg robot_name)_link_ee" />
+    <child link="clarius_holder" />
+    <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+  </joint>
+
+  <!-- US probe model -->
+  <link
+    name="clarius_holder">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://lbr_description/meshes/ultrasound_probe/clarius_holder.stl"
+          scale="0.001 0.001 0.001" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.2 0.2 0.2 1" />
+      </material>
+    </visual>
+  </link>
+
+  <!-- <link
+  name="probe_bota">
+  </link>
+  <joint name="probe_joint" type="fixed">
+    <parent link="probe_mounting" />
+    <child link="probe_bota" />
+    <origin xyz="0.0 0.0 0.14" rpy="0.0 0.0 0.0" />
+  </joint> -->
+
+  <link
+    name="probe">
+  </link>
+  <joint name="probe_transl_joint" type="fixed">
+    <parent link="$(arg robot_name)_link_ee" />
+    <child link="probe" />
+    <origin xyz="0.0 0.0 0.175" rpy="0.0 0.0 -${pi/2}" />
+  </joint>
+
+</robot>

@@ -59,6 +59,9 @@ def generate_launch_description() -> LaunchDescription:
     controller = LBRROS2ControlMixin.node_controller_spawner(
         controller=LaunchConfiguration("ctrl")
     )
+    motion_control_handle = LBRROS2ControlMixin.node_controller_spawner(
+        controller="motion_control_handle"
+    )
 
     controller_event_handler = RegisterEventHandler(
         OnProcessStart(
@@ -68,6 +71,7 @@ def generate_launch_description() -> LaunchDescription:
                 force_torque_broadcaster,
                 lbr_state_broadcaster,
                 controller,
+                motion_control_handle
             ],
         )
     )

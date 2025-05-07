@@ -39,6 +39,7 @@
                 <geometry>
                     <mesh filename="package://lbr_description/meshes/iiwa14/visual/link_0.dae" />
                 </geometry>
+                <material name="transparent"/>
             </visual>
             <collision>
                 <origin rpy="0 0 0" xyz="0 0 0" />
@@ -73,6 +74,7 @@
                 <geometry>
                     <mesh filename="package://lbr_description/meshes/iiwa14/visual/link_1.dae" />
                 </geometry>
+                <material name="transparent"/>
             </visual>
             <collision>
                 <origin rpy="0 0 0" xyz="0.0 0.0 -0.1475" />
@@ -107,6 +109,7 @@
                 <geometry>
                     <mesh filename="package://lbr_description/meshes/iiwa14/visual/link_2.dae" />
                 </geometry>
+                <material name="transparent"/>
             </visual>
             <collision>
                 <origin rpy="0 0 0" xyz="0.0 0.01 -0.36" />
@@ -142,6 +145,7 @@
                 <geometry>
                     <mesh filename="package://lbr_description/meshes/iiwa14/visual/link_3.dae" />
                 </geometry>
+                <material name="transparent"/>
             </visual>
             <collision>
                 <origin rpy="0 0 0" xyz="0.0 0.0 -0.588" />
@@ -178,6 +182,7 @@
                 <geometry>
                     <mesh filename="package://lbr_description/meshes/iiwa14/visual/link_4.dae" />
                 </geometry>
+                <material name="transparent"/>
             </visual>
             <collision>
                 <origin rpy="0 0 0" xyz="0.0 -0.0105 -0.78" />
@@ -212,6 +217,7 @@
                 <geometry>
                     <mesh filename="package://lbr_description/meshes/iiwa14/visual/link_5.dae" />
                 </geometry>
+                <material name="transparent"/>
             </visual>
             <collision>
                 <origin rpy="0 0 0" xyz="0.0 0.0 -0.9875" />
@@ -246,6 +252,7 @@
                 <geometry>
                     <mesh filename="package://lbr_description/meshes/iiwa14/visual/link_6.dae" />
                 </geometry>
+                <material name="transparent"/>
             </visual>
             <collision>
                 <origin rpy="0 0 0" xyz="0.0 0.0707 -1.18" />
@@ -281,6 +288,7 @@
                 <geometry>
                     <mesh filename="package://lbr_description/meshes/iiwa14/visual/link_7.dae" />
                 </geometry>
+                <material name="transparent"/>
             </visual>
             <collision>
                 <origin rpy="0 0 0" xyz="0.0 0.0 -1.271" />
