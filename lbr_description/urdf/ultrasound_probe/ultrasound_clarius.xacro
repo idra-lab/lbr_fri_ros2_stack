@@ -4,7 +4,7 @@
 <robot name="iiwa14" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
   <material name="transparent">
-    <color rgba="1 0 0 1.0" />
+    <color rgba="0.2 0.2 0.2 0.1" />
   </material>
   <!-- include the lbr iiwa macro -->
   <xacro:include filename="$(find lbr_description)/urdf/iiwa14/iiwa14_description.xacro" />
@@ -39,10 +39,9 @@
   <joint name="probe_joint" type="fixed">
     <parent link="$(arg robot_name)_link_ee" />
     <child link="clarius_holder" />
-    <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+    <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 ${pi}" />
   </joint>
-
-  <!-- US probe model -->
+  <!-- US holder model -->
   <link
     name="clarius_holder">
     <visual>
@@ -51,12 +50,28 @@
         <mesh filename="package://lbr_description/meshes/ultrasound_probe/clarius_holder.stl"
           scale="0.001 0.001 0.001" />
       </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.2 0.2 0.2 1" />
-      </material>
+      <material name="transparent"/>
     </visual>
+  </link>
+  <!-- US probe model -->
+  <joint name="clarius_joint" type="fixed">
+    <parent link="clarius_holder" />
+    <child link="clarius_probe" />
+    <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+  </joint>
+
+  <link
+  name="clarius_probe">
+  <visual>
+    <origin xyz="0 0 0" rpy="0 0 0" />
+    <geometry>
+      <mesh filename="package://lbr_description/meshes/ultrasound_probe/clarius.stl"
+        scale="0.001 0.001 0.001" />
+    </geometry>
+    <material name="grey">
+      <color rgba="1.0 1.0 1.0 1.0" />
+    </material>
+  </visual>
   </link>
 
   <!-- <link
@@ -74,7 +89,7 @@
   <joint name="probe_transl_joint" type="fixed">
     <parent link="$(arg robot_name)_link_ee" />
     <child link="probe" />
-    <origin xyz="0.0 0.0 0.175" rpy="0.0 0.0 -${pi/2}" />
+    <origin xyz="0.0 0.013 0.145" rpy="0.0 -0.610865 -${pi/2}" />
   </joint>
 
 </robot>
