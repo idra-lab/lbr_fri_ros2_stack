@@ -41,8 +41,8 @@
     gravity_compensation:
       type: gravity_compensation/GravityCompensation
     
-    kuka_cartesian_impedance_controller:
-      type: kuka_cartesian_impedance_controller/KukaCartesianImpedanceController
+    kuka_clik_controller:
+      type: kuka_clik_controller/KukaClikController
 
     
     cbf_cartesian_impedance_controller:
@@ -293,7 +293,7 @@
     alpha_2: 100.0
 
 
-/**/kuka_cartesian_impedance_controller:
+/**/kuka_clik_controller:
   ros__parameters:
     max_linear_velocity: 0.3
     max_angular_velocity: 0.3
@@ -314,4 +314,12 @@
       - lbr_A5
       - lbr_A6
       - lbr_A7
+    nullspace_desired_configuration:
+      - 0.0
+      - 0.70
+      - 0.0
+      - -1.25
+      - 0.0
+      - 1.40
+      - 0.0
 

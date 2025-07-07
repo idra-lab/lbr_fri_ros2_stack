@@ -24,8 +24,8 @@ A5:
   velocity: 130
   effort: 200
 A6:
-  lower: -119.7
-  upper: 119.7
+  lower: -119.5
+  upper: 119.5
   velocity: 135
   effort: 200
 A7:

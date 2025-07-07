@@ -23,8 +23,8 @@
       type: cartesian_controller_handles/MotionControlHandle
 
         
-    kuka_cartesian_impedance_controller:
-      type: kuka_cartesian_impedance_controller/KukaCartesianImpedanceController
+    kuka_clik_controller:
+      type: kuka_clik_controller/KukaClikController
 
 
 /**/motion_control_handle:
@@ -104,14 +104,14 @@
     compensate_gravity: false
     compensate_coriolis: false
 
-/**/kuka_cartesian_impedance_controller:
+/**/kuka_clik_controller:
   ros__parameters:
-    max_linear_velocity: 0.08
-    max_angular_velocity: 0.2
+    max_linear_velocity: 0.3
+    max_angular_velocity: 0.3
     kuka_hw: false
-    end_effector_link: "probe"
+    end_effector_link: "lbr_link_ee"
     robot_base_link: "lbr_link_0"
-    compliance_ref_link: "probe"
+    compliance_ref_link: "lbr_link_ee"
     command_interfaces:
       - effort
     state_interfaces:
@@ -125,4 +125,12 @@
       - lbr_A5
       - lbr_A6
       - lbr_A7
+    nullspace_desired_configuration:
+      - 0.0
+      - 0.70
+      - 0.0
+      - -1.25
+      - 0.0
+      - 1.40
+      - 0.0
 

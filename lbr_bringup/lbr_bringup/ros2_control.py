@@ -42,7 +42,7 @@ class LBRROS2ControlMixin:
                 "joint_impedance_controller",
                 "motion_control_handle",
                 "cbf_cartesian_impedance_controller",
-                "kuka_cartesian_impedance_controller",
+                "kuka_clik_controller",
                 "hocbf_cartesian_impedance_controller",
             ],
         )
