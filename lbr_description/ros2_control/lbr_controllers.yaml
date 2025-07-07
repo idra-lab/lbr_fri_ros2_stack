@@ -41,6 +41,8 @@
     gravity_compensation:
       type: gravity_compensation/GravityCompensation
 
+    kuka_clik_controller:
+      type: kuka_clik_controller/KukaClikController
 
 /**/force_torque_broadcaster:
   ros__parameters:
@@ -187,3 +189,32 @@
       - lbr_A5
       - lbr_A6
       - lbr_A7
+
+/**/kuka_clik_controller:
+  ros__parameters:
+    max_linear_velocity: 0.3
+    max_angular_velocity: 0.3
+    end_effector_link: "lbr_link_ee"
+    robot_base_link: "lbr_link_0"
+    compliance_ref_link: "lbr_link_ee"
+    command_interfaces:
+      - effort
+    state_interfaces:
+      - position
+      - velocity
+    joints:
+      - lbr_A1
+      - lbr_A2
+      - lbr_A3
+      - lbr_A4
+      - lbr_A5
+      - lbr_A6
+      - lbr_A7
+    nullspace_desired_configuration:
+      - 0.0
+      - 0.70
+      - 0.0
+      - -1.25
+      - 0.0
+      - 1.40
+      - 0.0
