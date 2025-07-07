@@ -40,6 +40,7 @@ class LBRROS2ControlMixin:
                 "gravity_compensation",
                 "cartesian_impedance_controller",
                 "joint_impedance_controller",
+                "kuka_clik_controller",
             ],
         )
 
@@ -106,6 +107,7 @@ class LBRROS2ControlMixin:
                 ("cartesian_impedance_controller/target_wrench", "target_wrench"),
                 ("joint_impedance_controller/target_frame", "target_frame"),
                 ("joint_impedance_controller/target_wrench", "target_wrench"),
+                ("kuka_clik_controller/target_frame", "target_frame"),
             ],
             **kwargs,
         )
