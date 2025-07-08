@@ -83,7 +83,7 @@
   ros__parameters:
     # when set as true the controller with forward the position commands to the
     # robot together with the torque commands (must be false when using gazebo)
-    kuka_hw: true
+    command_current_configuration: true
     # This is the tip of the robot tool that you usually use for your task.
     # For instance, it could be the drilling bit of a screwdriver or a grinding
     # tool.  When you specify a target_wrench, i.e. some additional forces that
@@ -126,20 +126,20 @@
       - lbr_A6
       - lbr_A7
     delta_tau_max: 1.0 # Nm
-    stiffness:  # w.r.t. compliance_ref_link coordinates
+    stiffness:  # w.r.t. compliance_ref_link coordinates -> can be changed at runtime
         trans_x: 1000.0
         trans_y: 1000.0
         trans_z: 1000.0
-        rot_x: 200.0
-        rot_y: 200.0
-        rot_z: 200.0
+        rot_x: 30.0
+        rot_y: 30.0
+        rot_z: 30.0
     nullspace_stiffness: 0.0 # 10.0
     compensate_gravity: false
     compensate_coriolis: false
 
 /**/joint_impedance_controller:
   ros__parameters:
-    kuka_hw: true
+    command_current_configuration: true
     end_effector_link: "lbr_link_ee"
     robot_base_link: "lbr_link_0"
     ft_sensor_ref_link: "lbr_link_ee"
@@ -176,6 +176,9 @@
     end_effector_link: "lbr_link_ee"
     robot_base_link: "lbr_link_0"
     ft_sensor_ref_link: "lbr_link_ee"
+    compensate_gravity: false
+    compensate_coriolis: false
+    command_current_configuration: true # KUKA specific
     command_interfaces:
       - effort
     state_interfaces:
