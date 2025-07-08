@@ -133,7 +133,15 @@
         rot_x: 30.0
         rot_y: 30.0
         rot_z: 30.0
-    nullspace_stiffness: 0.0 # 10.0
+    nullspace_stiffness: 10.0
+    nullspace_desired_configuration:
+      - 0.0
+      - 0.70
+      - 0.0
+      - -1.25
+      - 0.0
+      - 1.40
+      - 0.0
     compensate_gravity: false
     compensate_coriolis: false
 
@@ -170,7 +178,6 @@
     compensate_gravity: false
     compensate_coriolis: false
 
-    
 /**/gravity_compensation:
   ros__parameters:
     end_effector_link: "lbr_link_ee"
