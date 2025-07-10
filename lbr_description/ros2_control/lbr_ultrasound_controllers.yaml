@@ -15,22 +15,42 @@
     lbr_state_broadcaster:
       type: lbr_ros2_control/LBRStateBroadcaster
 
+    # ROS 2 control controllers
+    joint_trajectory_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+    # LBR ROS 2 control controllers
+    lbr_joint_position_command_controller:
+      type: lbr_ros2_control/LBRJointPositionCommandController
+
+    forward_position_controller:
+      type: position_controllers/JointGroupPositionController
+
+    lbr_torque_command_controller:
+      type: lbr_ros2_control/LBRTorqueCommandController
+
+    lbr_wrench_command_controller:
+      type: lbr_ros2_control/LBRWrenchCommandController
+
     cartesian_impedance_controller:
       type: cartesian_impedance_controller/CartesianImpedanceController
+    
+    joint_impedance_controller:
+      type: joint_impedance_controller/JointImpedanceController
 
+    gravity_compensation:
+      type: gravity_compensation/GravityCompensation
 
-    motion_control_handle:
-      type: cartesian_controller_handles/MotionControlHandle
-
-        
     kuka_clik_controller:
       type: kuka_clik_controller/KukaClikController
 
-
-/**/motion_control_handle:
+/**/force_torque_broadcaster:
   ros__parameters:
-    end_effector_link: "probe"
-    robot_base_link: "lbr_link_0"
+    frame_id: lbr/lbr_link_ee
+    sensor_name: estimated_ft_sensor
+
+/**/joint_trajectory_controller:
+  ros__parameters:
     joints:
       - lbr_A1
       - lbr_A2
@@ -39,17 +59,31 @@
       - lbr_A5
       - lbr_A6
       - lbr_A7
+    command_interfaces:
+      - position
+    state_interfaces:
+      - position
+      - velocity
+    state_publish_rate: 50.0
+    action_monitor_rate: 20.0
 
-/**/force_torque_broadcaster:
+/**/forward_position_controller:
   ros__parameters:
-    frame_id: lbr/lbr_link_ee
-    sensor_name: estimated_ft_sensor
-    
+    joints:
+      - lbr_A1
+      - lbr_A2
+      - lbr_A3
+      - lbr_A4
+      - lbr_A5
+      - lbr_A6
+      - lbr_A7
+    interface_name: position
+
 /**/cartesian_impedance_controller:
   ros__parameters:
     # when set as true the controller with forward the position commands to the
     # robot together with the torque commands (must be false when using gazebo)
-    kuka_hw: true
+    command_current_configuration: true
     # This is the tip of the robot tool that you usually use for your task.
     # For instance, it could be the drilling bit of a screwdriver or a grinding
     # tool.  When you specify a target_wrench, i.e. some additional forces that
@@ -91,27 +125,87 @@
       - lbr_A5
       - lbr_A6
       - lbr_A7
-    max_impedance_force: 10000.0 # N
     delta_tau_max: 1.0 # Nm
-    stiffness:  # w.r.t. compliance_ref_link coordinates
-        trans_x: 800.0
-        trans_y: 800.0
-        trans_z: 800.0
-        rot_x: 20.0
-        rot_y: 20.0
-        rot_z: 20.0
+    stiffness:  # w.r.t. compliance_ref_link coordinates -> can be changed at runtime
+        trans_x: 1000.0
+        trans_y: 1000.0
+        trans_z: 1000.0
+        rot_x: 30.0
+        rot_y: 30.0
+        rot_z: 30.0
     nullspace_stiffness: 0.0 # 10.0
     compensate_gravity: false
     compensate_coriolis: false
+
+/**/joint_impedance_controller:
+  ros__parameters:
+    command_current_configuration: true
+    end_effector_link: "probe"
+    robot_base_link: "lbr_link_0"
+    ft_sensor_ref_link: "probe"
+    compliance_ref_link: "probe"
+
+    command_interfaces:
+      - effort
+    state_interfaces:
+      - position
+      - velocity
+    joints:
+      - lbr_A1
+      - lbr_A2
+      - lbr_A3
+      - lbr_A4
+      - lbr_A5
+      - lbr_A6
+      - lbr_A7
+    stiffness:
+      joint1: 200.0
+      joint2: 200.0
+      joint3: 200.0
+      joint4: 200.0
+      joint5: 100.0
+      joint6: 100.0
+      joint7: 100.0
+    nullspace_stiffness: 0.0 # 10.0
+    compensate_gravity: false
+    compensate_coriolis: false
+
+    
+/**/gravity_compensation:
+  ros__parameters:
+    end_effector_link: "probe"
+    robot_base_link: "lbr_link_0"
+    ft_sensor_ref_link: "probe"
+    compensate_gravity: false
+    compensate_coriolis: false
+    command_current_configuration: true # KUKA specific
+    command_interfaces:
+      - effort
+    state_interfaces:
+      - position
+      - velocity
+    joints:
+      - lbr_A1
+      - lbr_A2
+      - lbr_A3
+      - lbr_A4
+      - lbr_A5
+      - lbr_A6
+      - lbr_A7
 
 /**/kuka_clik_controller:
   ros__parameters:
     max_linear_velocity: 0.3
     max_angular_velocity: 0.3
-    kuka_hw: false
-    end_effector_link: "lbr_link_ee"
+    # CLIK parameters
+    clik_dt: 0.1 # integration time step
+    clik_it_max: 50 # maximum number of iterations for each control step
+    clik_eps: 2e-4 # convergence threshold
+    clik_filter_alpha: 0.5 # low-pass filter alpha for the output (lower it to avoid motor noise) 
+
+    end_effector_link: "probe"
     robot_base_link: "lbr_link_0"
-    compliance_ref_link: "lbr_link_ee"
+    compliance_ref_link: "probe"
     command_interfaces:
       - effort
     state_interfaces:
@@ -133,4 +227,3 @@
       - 0.0
       - 1.40
       - 0.0
-
